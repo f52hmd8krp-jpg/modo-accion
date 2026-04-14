@@ -1,11 +1,11 @@
-const CACHE = 'modo-accion-v5';
+const CACHE = 'modo-accion-v6';
 const ASSETS = [
   '/modo-accion/',
   '/modo-accion/index.html',
   '/modo-accion/manifest.json',
   '/modo-accion/icon-192.png',
   '/modo-accion/icon-512.png',
-  '/modo-accion/apple-touch-icon.png',
+  '/modo-accion/apple-touch-icon-v2.png',
   'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 
