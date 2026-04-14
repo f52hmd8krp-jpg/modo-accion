@@ -1,14 +1,8 @@
-const CACHE = 'modo-accion-v3';
-const ASSETS = [
-  '/modo-accion/',
-  '/modo-accion/index.html',
-  '/modo-accion/manifest.json',
-  '/modo-accion/icon.svg',
-  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap'
-];
+const CACHE = 'modo-accion-v2';
+const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
 
@@ -21,12 +15,6 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      if(res && res.status === 200 && e.request.method === 'GET'){
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-      }
-      return res;
-    }).catch(() => caches.match('/modo-accion/index.html')))
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('./index.html')))
   );
 });

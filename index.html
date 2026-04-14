@@ -820,9 +820,11 @@ function onQRFound(data){
     console.warn('[QR] Token mismatch — QR:',qrToken,' App:',appToken);
     return;
   }
-  showToast('✓ '+h.name+' detectado');
+  // Verificar si ya está completado hoy
+  if(s.done[h.id]){ showToast(h.name+' ya completado hoy ✓'); return; }
+  // El QR físico ES la verificación — completar directamente
   goTo('home');
-  setTimeout(()=>tapHabit(h.id),400);
+  setTimeout(()=>finishHabit(h.id, {qr:true}), 300);
 }
 
 
