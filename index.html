@@ -509,12 +509,12 @@ const ICONS={
 };
 
 const H=[
-  {id:'gym',      name:'Gimnasio', pts:30,bPts:10,bCond:'streak5', val:'qr',   minMin:0 },
-  {id:'estudio',  name:'Estudio',  pts:25,bPts:10,bCond:'time90',  val:'timer',minMin:60},
-  {id:'proyecto', name:'Proyecto', pts:25,bPts:10,bCond:'time90',  val:'timer',minMin:60},
-  {id:'lectura',  name:'Lectura',  pts:15,bPts:5, bCond:'streak7', val:'timer',minMin:20},
-  {id:'dieta',    name:'Dieta',    pts:15,bPts:0, bCond:'',        val:'text', minMin:0 },
-  {id:'dormir',   name:'Dormir',   pts:10,bPts:10,bCond:'before23',val:'text', minMin:0 },
+  {id:'gym',      name:'Gimnasio', pts:30,bPts:10,bCond:'streak5', val:'qr', minMin:0 },
+  {id:'estudio',  name:'Estudio',  pts:25,bPts:10,bCond:'streak5', val:'qr', minMin:0 },
+  {id:'proyecto', name:'Proyecto', pts:25,bPts:10,bCond:'streak5', val:'qr', minMin:0 },
+  {id:'lectura',  name:'Lectura',  pts:15,bPts:5, bCond:'streak7', val:'qr', minMin:0 },
+  {id:'dieta',    name:'Dieta',    pts:15,bPts:5, bCond:'streak7', val:'qr', minMin:0 },
+  {id:'dormir',   name:'Dormir',   pts:10,bPts:10,bCond:'before23',val:'qr', minMin:0 },
 ];
 const MSGS=['Empieza tu día','Un hábito hecho','En marcha','A mitad','Ya casi','Casi perfecto','Día perfecto'];
 const MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -823,8 +823,10 @@ function onQRFound(data){
   // Verificar si ya está completado hoy
   if(s.done[h.id]){ showToast(h.name+' ya completado hoy ✓'); return; }
   // El QR físico ES la verificación — completar directamente
+  // Bonus de Dormir: si escaneas antes de las 23h
+  const bonus = h.bCond==='before23' && new Date().getHours()<23;
   goTo('home');
-  setTimeout(()=>finishHabit(h.id, {qr:true}), 300);
+  setTimeout(()=>finishHabit(h.id, {qr:true, bonus}), 300);
 }
 
 
