@@ -1059,7 +1059,11 @@ function shareWA(){
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-function doReset(){if(confirm('Borrar todos los datos.')){localStorage.removeItem('ma_v5');location.reload();}}
+function doReset(){
+  if(!confirm('¿Borrar todos los datos?\nSe perderán hábitos, puntos y rachas.'))return;
+  if(!confirm('Segunda confirmación — esto no se puede deshacer.\n¿Continuar?'))return;
+  localStorage.removeItem('ma_v5');location.reload();
+}
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 init();
