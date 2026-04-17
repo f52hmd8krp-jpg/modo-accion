@@ -359,8 +359,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div class="slbl">Progreso por hábito</div>
   <div class="chart-sec">
     <div class="chart-tabs">
-      <button class="ctab active" id="ctab-days" onclick="switchChartTab('days')">14 días</button>
-      <button class="ctab" id="ctab-weeks" onclick="switchChartTab('weeks')">8 semanas</button>
+      <button class="ctab active" id="ctab-days" onclick="switchChartTab('days')">Semana</button>
+      <button class="ctab" id="ctab-weeks" onclick="switchChartTab('weeks')">Mes</button>
     </div>
     <div class="line-chart-wrap"><svg id="lineChart" width="100%" height="140" style="overflow:visible"></svg></div>
     <div class="chart-legend" id="chartLegend"></div>
@@ -981,15 +981,9 @@ function renderLineChart(s){
   let labels=[], slots=[];
   const today=new Date();
   if(chartTab==='days'){
-    for(let i=13;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);slots.push(d.toISOString().slice(0,10));labels.push(i===0?'hoy':String(d.getDate()));}
+    for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);slots.push(d.toISOString().slice(0,10));labels.push(i===0?'hoy':['D','L','M','X','J','V','S'][d.getDay()]);}
   } else {
-    for(let i=7;i>=0;i--){
-      const end=new Date(today);end.setDate(today.getDate()-i*7);
-      const start=new Date(end);start.setDate(end.getDate()-6);
-      const weekDays=[];for(let j=0;j<7;j++){const d=new Date(start);d.setDate(start.getDate()+j);weekDays.push(d.toISOString().slice(0,10));}
-      slots.push(weekDays);
-      labels.push('S-'+i);
-    }
+    for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);slots.push(d.toISOString().slice(0,10));labels.push(i===0?'hoy':i%7===0?String(d.getDate()):'');}
   }
 
   const n=slots.length;
@@ -1010,15 +1004,8 @@ function renderLineChart(s){
     const color=HCOLORS[h.id]||'#fff';
     const pts=slots.map((slot,i)=>{
       let done=false;
-      if(chartTab==='days'){
-        if(i===slots.length-1)done=!!s.done[h.id];
-        else done=!!(s.history[slot]&&s.history[slot].includes(h.id));
-      } else {
-        const days=slot;
-        const last=days[days.length-1];
-        if(last===today.toISOString().slice(0,10))done=!!s.done[h.id];
-        else done=days.some(ds=>s.history[ds]&&s.history[ds].includes(h.id));
-      }
+      if(i===slots.length-1)done=!!s.done[h.id];
+      else done=!!(s.history[slot]&&s.history[slot].includes(h.id));
       const x=padL+i*cW;
       const y=padT+(done?0:1)*(H2-padT-padB);
       return {x,y,done};
@@ -1034,7 +1021,7 @@ function renderLineChart(s){
   });
 
   // X labels
-  const step=chartTab==='days'?2:1;
+  const step=1;
   labels.forEach((lbl,i)=>{
     if(i%step!==0&&i!==n-1)return;
     const x=padL+i*cW;
@@ -1062,7 +1049,7 @@ function renderStats(){
   document.getElementById('statsDate').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const sg=document.getElementById('strGrid');sg.innerHTML='';
   H.forEach(h=>{const str=calcStreak(h.id,s);sg.innerHTML+=`<div class="str-card"><div class="str-icon">${ICONS[h.id]}</div><div class="str-val">${str}</div><div class="str-name">${h.name}</div></div>`;});
-  renderLineChart(s);
+  setTimeout(()=>renderLineChart(s),50);
   const wc=document.getElementById('wChart');wc.innerHTML='';const now=new Date();
   for(let i=6;i>=0;i--){
     const d=new Date(now);d.setDate(now.getDate()-i);const ds=d.toISOString().slice(0,10),isT=i===0;
