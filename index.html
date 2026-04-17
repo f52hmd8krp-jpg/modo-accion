@@ -166,6 +166,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .str-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--w);line-height:1}
 .str-name{font-size:9px;color:var(--w3);margin-top:3px;font-family:'DM Mono',monospace;letter-spacing:.3px}
 .chart-sec{padding:0 22px 22px}
+.chart-tabs{display:flex;gap:6px;margin-bottom:14px}
+.ctab{background:transparent;border:1px solid var(--b1);border-radius:7px;color:var(--w3);font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;padding:6px 14px;cursor:pointer;transition:all .2s}
+.ctab.active{background:var(--w);color:var(--bg);border-color:var(--w)}
+.line-chart-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 10px 10px;margin-bottom:12px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px 14px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.5px;cursor:pointer}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .week-chart{display:flex;align-items:flex-end;gap:4px;height:78px}
 .ccol{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
 .cbar-w{flex:1;width:100%;display:flex;align-items:flex-end}
@@ -349,6 +356,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   </div>
   <div class="slbl">Racha individual</div>
   <div class="streak-grid" id="strGrid"></div>
+  <div class="slbl">Progreso por hábito</div>
+  <div class="chart-sec">
+    <div class="chart-tabs">
+      <button class="ctab active" id="ctab-days" onclick="switchChartTab('days')">14 días</button>
+      <button class="ctab" id="ctab-weeks" onclick="switchChartTab('weeks')">8 semanas</button>
+    </div>
+    <div class="line-chart-wrap"><svg id="lineChart" width="100%" height="140" style="overflow:visible"></svg></div>
+    <div class="chart-legend" id="chartLegend"></div>
+  </div>
   <div class="slbl">Semana</div>
   <div class="chart-sec"><div class="week-chart" id="wChart"></div></div>
   <div class="slbl">Historial</div>
@@ -945,12 +961,108 @@ function finishHabit(id,data={}){
 function closeOk(){document.getElementById('mOk').classList.remove('open');}
 
 // ═══ STATS ═══
+const HCOLORS={gym:'#e05c5c',estudio:'#5c9be0',proyecto:'#e0a85c',lectura:'#7ec87e',dieta:'#b07ee0',dormir:'#5cd4d4'};
+let chartTab='days', hiddenH=new Set();
+
+function switchChartTab(tab){
+  chartTab=tab;
+  document.getElementById('ctab-days').className='ctab'+(tab==='days'?' active':'');
+  document.getElementById('ctab-weeks').className='ctab'+(tab==='weeks'?' active':'');
+  renderLineChart(getS());
+}
+
+function renderLineChart(s){
+  const svg=document.getElementById('lineChart');
+  if(!svg)return;
+  const W=svg.parentElement.clientWidth-20||300, H2=140;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H2}`);
+
+  // Build data points
+  let labels=[], slots=[];
+  const today=new Date();
+  if(chartTab==='days'){
+    for(let i=13;i>=0;i--){const d=new Date(today);d.setDate(today.getDate()-i);slots.push(d.toISOString().slice(0,10));labels.push(i===0?'hoy':String(d.getDate()));}
+  } else {
+    for(let i=7;i>=0;i--){
+      const end=new Date(today);end.setDate(today.getDate()-i*7);
+      const start=new Date(end);start.setDate(end.getDate()-6);
+      const weekDays=[];for(let j=0;j<7;j++){const d=new Date(start);d.setDate(start.getDate()+j);weekDays.push(d.toISOString().slice(0,10));}
+      slots.push(weekDays);
+      labels.push('S-'+i);
+    }
+  }
+
+  const n=slots.length;
+  const padL=6,padR=6,padT=14,padB=28;
+  const cW=(W-padL-padR)/Math.max(n-1,1);
+
+  // Grid lines
+  let out='';
+  [0,33,66,100].forEach(pct=>{
+    const y=padT+(1-pct/100)*(H2-padT-padB);
+    out+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="rgba(255,255,255,.05)" stroke-width="1"/>`;
+    if(pct>0)out+=`<text x="${padL}" y="${y-3}" font-size="7" fill="rgba(255,255,255,.2)" font-family="monospace">${pct}%</text>`;
+  });
+
+  // Lines per habit
+  H.forEach(h=>{
+    if(hiddenH.has(h.id))return;
+    const color=HCOLORS[h.id]||'#fff';
+    const pts=slots.map((slot,i)=>{
+      let done=false;
+      if(chartTab==='days'){
+        if(i===slots.length-1)done=!!s.done[h.id];
+        else done=!!(s.history[slot]&&s.history[slot].includes(h.id));
+      } else {
+        const days=slot;
+        const last=days[days.length-1];
+        if(last===today.toISOString().slice(0,10))done=!!s.done[h.id];
+        else done=days.some(ds=>s.history[ds]&&s.history[ds].includes(h.id));
+      }
+      const x=padL+i*cW;
+      const y=padT+(done?0:1)*(H2-padT-padB);
+      return {x,y,done};
+    });
+
+    // Path
+    const d2=pts.map((p,i)=>(i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`)).join(' ');
+    out+=`<path d="${d2}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+    // Dots
+    pts.forEach(p=>{
+      out+=`<circle cx="${p.x}" cy="${p.y}" r="${p.done?3.5:2}" fill="${p.done?color:'rgba(255,255,255,.1)'}" stroke="${color}" stroke-width="${p.done?0:1}"/>`;
+    });
+  });
+
+  // X labels
+  const step=chartTab==='days'?2:1;
+  labels.forEach((lbl,i)=>{
+    if(i%step!==0&&i!==n-1)return;
+    const x=padL+i*cW;
+    out+=`<text x="${x}" y="${H2-3}" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.3)" font-family="monospace">${lbl}</text>`;
+  });
+
+  svg.innerHTML=out;
+
+  // Legend
+  const leg=document.getElementById('chartLegend');if(!leg)return;
+  leg.innerHTML='';
+  H.forEach(h=>{
+    const color=HCOLORS[h.id]||'#fff';
+    const hidden=hiddenH.has(h.id);
+    const el=document.createElement('div');el.className='legend-item';
+    el.innerHTML=`<div class="legend-dot" style="background:${hidden?'transparent':''+color};border:1px solid ${color}"></div><span style="opacity:${hidden?.4:1}">${h.name.toLowerCase()}</span>`;
+    el.onclick=()=>{if(hiddenH.has(h.id))hiddenH.delete(h.id);else hiddenH.add(h.id);renderLineChart(s);};
+    leg.appendChild(el);
+  });
+}
+
 function calcStreak(id,s){let n=s.done[id]?1:0;for(let i=1;i<=365;i++){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().slice(0,10);if(s.history[ds]&&s.history[ds].includes(id))n++;else break;}return n;}
 function renderStats(){
   const s=getS();
   document.getElementById('statsDate').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const sg=document.getElementById('strGrid');sg.innerHTML='';
   H.forEach(h=>{const str=calcStreak(h.id,s);sg.innerHTML+=`<div class="str-card"><div class="str-icon">${ICONS[h.id]}</div><div class="str-val">${str}</div><div class="str-name">${h.name}</div></div>`;});
+  renderLineChart(s);
   const wc=document.getElementById('wChart');wc.innerHTML='';const now=new Date();
   for(let i=6;i>=0;i--){
     const d=new Date(now);d.setDate(now.getDate()-i);const ds=d.toISOString().slice(0,10),isT=i===0;
