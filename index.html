@@ -353,7 +353,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="cal-hrow">
       <button class="cal-nav" onclick="chMonth(-1)">‹</button>
       <div class="cal-month" id="calTitle"></div>
-      <button class="cal-nav" onclick="chMonth(1)">›</button>
+      <button class="cal-nav" id="calNext" onclick="chMonth(1)">›</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
   </div>
@@ -961,6 +961,10 @@ function renderStats(){
 function renderCal(s){
   const yr=calDate.getFullYear(),mo=calDate.getMonth(),todayStr=td();
   document.getElementById('calTitle').textContent=MES[mo]+' '+yr;
+  const now2=new Date(); const isCurrentMonth=(yr===now2.getFullYear()&&mo===now2.getMonth());
+  const nextBtn=document.getElementById('calNext');
+  nextBtn.style.opacity=isCurrentMonth?'0.2':'';
+  nextBtn.style.cursor=isCurrentMonth?'default':'pointer';
   const fd=new Date(yr,mo,1).getDay(),dim=new Date(yr,mo+1,0).getDate();
   const g=document.getElementById('calGrid');g.innerHTML='';
   DS.forEach(d=>{g.innerHTML+=`<div class="cdh">${d}</div>`;});
@@ -975,7 +979,12 @@ function renderCal(s){
     g.innerHTML+=`<div class="${cls}">${day}</div>`;
   }
 }
-function chMonth(d){calDate.setMonth(calDate.getMonth()+d);renderCal(getS());}
+function chMonth(d){
+  const next=new Date(calDate.getFullYear(),calDate.getMonth()+d,1);
+  const now=new Date(); const maxDate=new Date(now.getFullYear(),now.getMonth(),1);
+  if(next>maxDate)return;
+  calDate=next;renderCal(getS());
+}
 
 // ═══ SETTINGS ═══
 function renderSettings(){
