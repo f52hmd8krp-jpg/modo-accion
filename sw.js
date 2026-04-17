@@ -1,4 +1,4 @@
-const CACHE = 'modo-accion-v6';
+const CACHE = 'modo-accion-v7';
 const ASSETS = [
   '/modo-accion/',
   '/modo-accion/index.html',
@@ -6,6 +6,8 @@ const ASSETS = [
   '/modo-accion/icon-192.png',
   '/modo-accion/icon-512.png',
   '/modo-accion/apple-touch-icon-v2.png',
+  '/modo-accion/jsqr.min.js',
+  '/modo-accion/qrcode.min.js',
   'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 

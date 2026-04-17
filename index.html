@@ -491,25 +491,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <div class="toast" id="toast"></div>
 
 <!-- jsQR cargado de forma segura con fallback -->
+<script src="jsqr.min.js"></script>
+<script src="qrcode.min.js"></script>
 <script>
-window.jsQRLoaded = false;
-function loadJsQR(cb){
-  if(window.jsQRLoaded){cb();return;}
-  const s=document.createElement('script');
-  s.src='https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
-  s.onload=()=>{window.jsQRLoaded=true;cb();};
-  s.onerror=()=>{
-    // Fallback CDN
-    const s2=document.createElement('script');
-    s2.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
-    s2.onload=()=>{window.jsQRLoaded=true;cb();};
-    s2.onerror=()=>cb(new Error('jsQR no disponible'));
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s);
-}
+window.jsQRLoaded = true;
+function loadJsQR(cb){cb();}
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
 // ═══ ICONS ═══
