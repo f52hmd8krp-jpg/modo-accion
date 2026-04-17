@@ -210,6 +210,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .wa-input{width:100%;padding:13px 15px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w);font-family:'DM Mono',monospace;font-size:13px;outline:none;transition:border-color .2s;letter-spacing:.5px}
 .wa-input:focus{border-color:var(--b3)}
 .wa-input::placeholder{color:var(--w3)}
+.time-input{width:100%;padding:10px 8px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;color:var(--w);font-family:'DM Mono',monospace;font-size:13px;outline:none;transition:border-color .2s;text-align:center;-webkit-appearance:none;appearance:none}
+.time-input:focus{border-color:var(--b3)}
+::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.5}
 .qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .qr-card{border:1px solid var(--b1);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:border-color .2s}
 .qr-card:active{opacity:.7}
@@ -369,13 +372,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="set-row">
       <div class="set-info">
         <div class="set-lbl">Notificaciones</div>
-        <div class="set-sub">9:00 · 19:00 · 22:00</div>
+        <div class="set-sub" id="notifSub">9:00 · 19:00 · 22:00</div>
       </div>
       <div class="toggle" id="nToggle" onclick="toggleNotif()"></div>
     </div>
     <div class="set-row" style="flex-direction:column;align-items:flex-start">
       <div class="set-lbl">Días activos</div>
       <div class="days-row" id="dRow"></div>
+    </div>
+    <div class="set-row" style="flex-direction:column;align-items:flex-start">
+      <div class="set-lbl" style="margin-bottom:10px">Horarios</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;width:100%">
+        <input type="time" class="time-input" id="nt0" onchange="saveNotifTimes()">
+        <input type="time" class="time-input" id="nt1" onchange="saveNotifTimes()">
+        <input type="time" class="time-input" id="nt2" onchange="saveNotifTimes()">
+      </div>
     </div>
   </div>
   <div class="set-sec">
@@ -541,6 +552,7 @@ function getS(){
         if(old.wa) s.wa=old.wa;
         if(old.notif) s.notif=old.notif;
         if(old.notifDays) s.notifDays=old.notifDays;
+        if(old.notifTimes) s.notifTimes=old.notifTimes;
         saveS(s); // guardar en v5
         return s;
       }
@@ -548,7 +560,7 @@ function getS(){
   }
   return newS();
 }
-function newS(){return{points:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false]};}
+function newS(){return{points:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false],notifTimes:[9,19,22]};}
 function saveS(s){localStorage.setItem('ma_v5',JSON.stringify(s));}
 function td(){return new Date().toISOString().slice(0,10);}
 
@@ -994,6 +1006,9 @@ function renderSettings(){
   document.getElementById('nToggle').className='toggle'+(s.notif?' on':'');
   const dr=document.getElementById('dRow');dr.innerHTML='';
   DS.forEach((d,i)=>{const el=document.createElement('div');el.className='dtog'+((s.notifDays||[])[i]?' on':'');el.textContent=d;el.onclick=()=>togDay(i);dr.appendChild(el);});
+  const times=s.notifTimes||[9,19,22];
+  [0,1,2].forEach(i=>{const h=times[i];const el=document.getElementById('nt'+i);if(el)el.value=(h<10?'0'+h:h)+':00';});
+  const sub=document.getElementById('notifSub');if(sub)sub.textContent=times.map(h=>(h<10?'0'+h:h)+':00').join(' · ');
   buildSyncQR(s);
   buildQRGrid(s);
 }
@@ -1043,6 +1058,11 @@ function printQR(h){
   <script>new QRCode(document.getElementById('q'),{text:'${qd}',width:256,height:256,colorDark:'#000',colorLight:'#fff'});<\/script></body></html>`);
 }
 function saveWA(){const s=getS();s.wa=document.getElementById('waIn').value;saveS(s);showToast('Guardado');}
+function saveNotifTimes(){
+  const s=getS();
+  s.notifTimes=[0,1,2].map(i=>{const v=document.getElementById('nt'+i).value;return v?parseInt(v.split(':')[0]):([9,19,22])[i];});
+  saveS(s);schedNotif();showToast('Horarios guardados');
+}
 function togDay(i){const s=getS();if(!s.notifDays)s.notifDays=[false,true,true,true,true,true,false];s.notifDays[i]=!s.notifDays[i];saveS(s);renderSettings();}
 function toggleNotif(){
   const s=getS();
@@ -1053,8 +1073,9 @@ function toggleNotif(){
 function schedNotif(){
   const s=getS();if(!s.notif||!('Notification' in window)||Notification.permission!=='granted')return;
   const day=new Date().getDay();if(!(s.notifDays||[])[day])return;
-  [{h:9,msg:'Buenos días. '+H.length+' misiones.'},{h:19,msg:'Quedan pocas horas.'},{h:22,msg:'Último aviso.'}]
-  .forEach(t=>{const now=new Date(),target=new Date(now);target.setHours(t.h,0,0,0);const delay=target-now;if(delay>0)setTimeout(()=>{const s2=getS(),done=Object.keys(s2.done).length;new Notification('Modo Acción',{body:t.msg+' ('+done+'/'+H.length+')',tag:'ma-'+t.h});},delay);});
+  const times=s.notifTimes||[9,19,22];
+  const msgs=['Buenos días. '+H.length+' misiones.','Quedan pocas horas.','Último aviso.'];
+  times.forEach((h,i)=>{const now=new Date(),target=new Date(now);target.setHours(h,0,0,0);const delay=target-now;if(delay>0)setTimeout(()=>{const s2=getS(),done=Object.keys(s2.done).length;new Notification('Modo Acción',{body:msgs[i]+' ('+done+'/'+H.length+')',tag:'ma-'+h});},delay);});
 }
 
 function shareWA(){
