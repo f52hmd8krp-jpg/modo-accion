@@ -1154,7 +1154,14 @@ function printQR(h){
   </head><body><h2>${h.name}</h2><p>Escanea con Modo Acción</p><div id="q"></div><small>${s.token}</small><button onclick="window.print()">Imprimir</button>
   <script>new QRCode(document.getElementById('q'),{text:'${qd}',width:256,height:256,colorDark:'#000',colorLight:'#fff'});<\/script></body></html>`);
 }
-function saveWA(){const s=getS();s.wa=document.getElementById('waIn').value;saveS(s);showToast('Guardado');}
+function saveWA(){
+  const s=getS();
+  const raw=document.getElementById('waIn').value.trim();
+  const digits=raw.replace(/\D/g,'');
+  if(raw && digits.length<9){showToast('Número inválido — mínimo 9 dígitos');document.getElementById('waIn').value=s.wa||'';return;}
+  s.wa=raw;saveS(s);
+  if(raw)showToast('✓ Número guardado');
+}
 function saveNotifTimes(){
   const s=getS();
   s.notifTimes=[0,1,2].map(i=>{const v=document.getElementById('nt'+i).value;return v?parseInt(v.split(':')[0]):([9,19,22])[i];});
@@ -1181,7 +1188,7 @@ function shareWA(){
   const done=Object.keys(s.done).length,str=overallStreak(s);
   const msg=`Modo Acción — ${fecha}\n\n${lines}\n\n${done}/${H.length} · Racha ${str}d`;
   const phone=(s.wa||'').replace(/\D/g,'');
-  if(!phone){showToast('Añade un número en Ajustes');return;}
+  if(!phone){showToast('Añade tu número en Ajustes');setTimeout(()=>goTo('settings'),800);return;}
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
