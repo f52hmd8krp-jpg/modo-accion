@@ -47,9 +47,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .cdwn-lbl{font-size:9px;color:var(--w3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'DM Mono',monospace}
 .cdwn-val{font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.5px;color:var(--w2)}
 .cdwn-val.urgent{color:var(--w)}
-.prog-top{padding:0 22px 18px;text-align:center}
-.prog-pct{font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:1px;line-height:1;color:var(--w)}
-.prog-msg{font-size:12px;color:var(--w3);margin-top:6px;font-weight:300;letter-spacing:.3px}
+.habit-tip{margin:14px 22px 0;padding:13px 16px;border:1px solid var(--b1);border-radius:10px;font-size:13px;color:var(--w2);font-weight:300;letter-spacing:.2px;min-height:44px;line-height:1.5}
 .prog-circles{display:flex;align-items:center;justify-content:center;gap:0;padding:0 22px 26px}
 .prog-circle-item{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1}
 .prog-circle-main{flex:1.2}
@@ -290,10 +288,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       </div>
     </div>
   </div>
-  <div class="prog-top">
-    <div class="prog-pct" id="pPct">0%</div>
-    <div class="prog-msg" id="pMsg">Empieza tu día</div>
-  </div>
   <div class="prog-circles">
     <div class="prog-circle-item">
       <div class="mini-c">
@@ -314,8 +308,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
             stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2" id="pCircle"/>
         </svg>
         <div class="prog-center">
-          <div class="prog-num" id="pNum">0</div>
-          <div class="prog-den" id="pDen">/6</div>
+          <div class="prog-num" id="pNum">0%</div>
         </div>
       </div>
       <div class="mini-lbl">Hoy</div>
@@ -332,6 +325,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <div class="mini-lbl">Mes</div>
     </div>
   </div>
+  <div class="habit-tip" id="habitTip"></div>
   <div class="pts-row">
     <span class="pts-lbl">Puntos</span>
     <span class="pts-val" id="tPts">0</span>
@@ -566,6 +560,26 @@ const H=[
   {id:'dormir',   name:'Dormir',   pts:10,bPts:10,bCond:'before23',val:'qr', minMin:0 },
 ];
 const MSGS=['Empieza tu día','Un hábito hecho','En marcha','A mitad','Ya casi','Casi perfecto','Día perfecto'];
+const HTIPS={
+  gym:   ['Toca entrenar. Ve al gimnasio.','No hay excusas. Entrena hoy.','El gym te espera.'],
+  estudio:['Abre los apuntes ahora.','30 minutos de estudio. Ya.','Estudia antes de que se haga tarde.'],
+  proyecto:['Avanza en tu proyecto hoy.','Aunque sea 20 minutos. Proyecto.','Pon el temporizador. Proyecto.'],
+  lectura: ['Coge el libro. 10 páginas.','Leer ahora. 10 minutos bastan.','Lectura pendiente. Hazlo ya.'],
+  dieta:   ['Cuida lo que comes hoy.','Dieta en orden. Tú decides.','No lo estropees con la comida.'],
+  dormir:  ['Prepárate para acostarte pronto.','Antes de las 23h. Duerme bien.','Desconecta y prepárate para dormir.'],
+};
+function getHabitTip(s){
+  const h=new Date().getHours();
+  // Orden sugerido por hora del día
+  const order=h<11?['gym','estudio','proyecto','lectura','dieta','dormir']
+    :h<15?['dieta','proyecto','estudio','lectura','gym','dormir']
+    :h<20?['proyecto','lectura','estudio','dieta','gym','dormir']
+    :['dormir','lectura','dieta','proyecto','estudio','gym'];
+  const pending=order.filter(id=>!s.done[id]);
+  if(!pending.length)return'💪 Día completo. Descansa.';
+  const id=pending[0];const tips=HTIPS[id];
+  return tips[new Date().getDate()%tips.length];
+}
 const MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DS=['D','L','M','X','J','V','S'];
 
@@ -641,10 +655,8 @@ function renderHome(){
   const s=getS(),done=Object.keys(s.done).length,total=H.length;
   const pct=Math.round((done/total)*100);
   document.getElementById('pCircle').setAttribute('stroke-dashoffset',226.2*(1-pct/100));
-  document.getElementById('pNum').textContent=done;
-  document.getElementById('pDen').textContent='/'+total;
-  document.getElementById('pPct').textContent=pct+'%';
-  document.getElementById('pMsg').textContent=MSGS[done]||MSGS[MSGS.length-1];
+  document.getElementById('pNum').textContent=pct+'%';
+  const tipEl=document.getElementById('habitTip');if(tipEl)tipEl.textContent=getHabitTip(s);
   document.getElementById('tPts').textContent=s.points;
   document.getElementById('oStreak').textContent=overallStreak(s);
   // Mini circles semana y mes
