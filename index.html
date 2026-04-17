@@ -874,7 +874,18 @@ function renderManGrid(){
 
 // ═══ HABIT LOGIC ═══
 function tapHabit(id){
-  const s=getS(); if(s.done[id]){showToast('Ya completado hoy');return;}
+  const s=getS();
+  if(s.done[id]){
+    const d=s.done[id];const h=H.find(x=>x.id===id);
+    const hora=d.ts?new Date(d.ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):'—';
+    const ptsGanados=d.pts||h.pts;
+    document.getElementById('okPts').textContent='+'+ptsGanados;
+    let det=h.name.toLowerCase()+' · completado a las '+hora;
+    if(d.min>0)det+=' · '+d.min+' min';
+    document.getElementById('okDet').textContent=det;
+    document.getElementById('mOk').classList.add('open');
+    return;
+  }
   const h=H.find(x=>x.id===id); if(!h)return;
   if(h.val==='timer') openTimer(h); else openText(h,h.val==='qr');
 }
@@ -936,7 +947,7 @@ function finishHabit(id,data={}){
   if(h.bCond==='streak5'&&str>=4)bonus=h.bPts;
   if(h.bCond==='streak7'&&str>=6)bonus=h.bPts;
   if(data.bonus)bonus=h.bPts;
-  pts+=bonus;s.points+=pts;s.done[id]={ts:Date.now(),min:data.min||0,txt:data.txt||''};
+  pts+=bonus;s.points+=pts;s.done[id]={ts:Date.now(),min:data.min||0,txt:data.txt||'',pts};
   saveS(s);renderHome();
   document.getElementById('okPts').textContent='+'+pts;
   let det=h.name.toLowerCase()+' completado';
