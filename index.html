@@ -555,6 +555,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="qr-grid" id="qrGrid"></div>
   </div>
   <div class="set-sec">
+    <div class="set-sec-ttl">Nube ☁</div>
+    <div id="ghConnected" style="display:none;background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:10px;color:var(--w3);font-family:'DM Mono',monospace;margin-bottom:4px">SINCRONIZADO CON GITHUB GIST</div>
+      <div style="font-size:11px;color:var(--w2);word-break:break-all;margin-bottom:12px" id="ghGistLink"></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="bgSyncFromGist()" style="flex:1;padding:9px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--w2);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer">Sincronizar ahora</button>
+        <button onclick="disconnectGist()" style="padding:9px 14px;background:transparent;border:1px solid var(--b1);border-radius:8px;color:var(--w3);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer">Desconectar</button>
+      </div>
+    </div>
+    <div id="ghDisconnected">
+      <div style="font-size:11px;color:var(--w3);margin-bottom:10px;line-height:1.6;font-weight:300">
+        Conecta un token de GitHub para sincronizar automáticamente tus datos en la nube.<br>
+        <a href="https://github.com/settings/tokens/new?scopes=gist&description=ModoAccion" target="_blank" style="color:var(--w2);text-decoration:none">→ Crear token (solo permiso <b>gist</b>)</a>
+      </div>
+      <input type="password" id="ghTokenIn" class="wa-input" placeholder="ghp_xxxxxxxxxxxx" style="margin-bottom:8px">
+      <div id="ghStatus" style="font-size:10px;color:#e05c5c;font-family:'DM Mono',monospace;margin-bottom:8px;min-height:14px"></div>
+      <button onclick="connectGist()" style="width:100%;padding:13px;background:var(--w);border:none;border-radius:10px;color:var(--bg);font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px">Conectar con GitHub</button>
+    </div>
+  </div>
+  <div class="set-sec">
     <div class="set-sec-ttl">Copia de seguridad</div>
     <div style="font-size:11px;color:var(--w3);margin-bottom:13px;line-height:1.6;font-weight:300">
       Exporta tus datos para guardarlos o moverlos a otro dispositivo.
@@ -738,6 +758,8 @@ function getS(){
         if(old.notifDays) s.notifDays=old.notifDays;
         if(old.notifTimes) s.notifTimes=old.notifTimes;
         if(old.reflections) s.reflections=old.reflections;
+        if(old.ghToken) s.ghToken=old.ghToken;
+        if(old.ghGist) s.ghGist=old.ghGist;
         saveS(s); // guardar en v5
         return s;
       }
@@ -745,8 +767,71 @@ function getS(){
   }
   return newS();
 }
-function newS(){return{points:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false],notifTimes:[9,19,22],reflections:{}};}
-function saveS(s){localStorage.setItem('ma_v5',JSON.stringify(s));}
+function newS(){return{points:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false],notifTimes:[9,19,22],reflections:{},ghToken:'',ghGist:'',lastSaved:0};}
+function saveS(s){s.lastSaved=Date.now();localStorage.setItem('ma_v5',JSON.stringify(s));pushToGist(s);}
+
+async function pushToGist(s){
+  if(!s.ghToken||!s.ghGist)return;
+  try{await fetch('https://api.github.com/gists/'+s.ghGist,{method:'PATCH',
+    headers:{'Authorization':'token '+s.ghToken,'Content-Type':'application/json'},
+    body:JSON.stringify({files:{'modo-accion.json':{content:JSON.stringify(s)}}})});}
+  catch(e){}
+}
+
+async function bgSyncFromGist(){
+  const s=getS();if(!s.ghToken||!s.ghGist)return;
+  try{
+    const r=await fetch('https://api.github.com/gists/'+s.ghGist,{headers:{'Authorization':'token '+s.ghToken}});
+    if(!r.ok)return;
+    const data=await r.json();
+    const content=data.files['modo-accion.json']?.content;if(!content)return;
+    const cloud=JSON.parse(content);
+    const local=getS();
+    if((cloud.lastSaved||0)>(local.lastSaved||0)){
+      cloud.ghToken=local.ghToken||cloud.ghToken;
+      cloud.ghGist=local.ghGist||cloud.ghGist;
+      if(!cloud.reflections)cloud.reflections={};
+      localStorage.setItem('ma_v5',JSON.stringify(cloud));
+      renderHome();renderSettings();
+      showToast('☁ Datos restaurados desde la nube');
+    } else {
+      showToast('☁ Sincronizado');
+    }
+  }catch(e){}
+}
+
+async function connectGist(){
+  const token=(document.getElementById('ghTokenIn').value||'').trim();
+  if(!token){showToast('Pega tu token de GitHub');return;}
+  const statusEl=document.getElementById('ghStatus');
+  statusEl.textContent='Conectando…';
+  try{
+    const r=await fetch('https://api.github.com/gists',{headers:{'Authorization':'token '+token}});
+    if(!r.ok)throw new Error();
+    const gists=await r.json();
+    const existing=gists.find(g=>g.files&&g.files['modo-accion.json']);
+    const s=getS();s.ghToken=token;
+    if(existing){
+      s.ghGist=existing.id;saveS(s);
+      statusEl.textContent='';showToast('☁ Gist encontrado — sincronizando…');
+      renderSettings();bgSyncFromGist();
+    } else {
+      const cr=await fetch('https://api.github.com/gists',{method:'POST',
+        headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+        body:JSON.stringify({description:'Modo Acción backup',public:false,
+          files:{'modo-accion.json':{content:JSON.stringify(s)}}})});
+      if(!cr.ok)throw new Error();
+      const cData=await cr.json();s.ghGist=cData.id;saveS(s);
+      statusEl.textContent='';showToast('☁ Gist creado — datos guardados en la nube');
+      renderSettings();
+    }
+  }catch(e){statusEl.textContent='Token inválido o sin permisos gist';}
+}
+
+function disconnectGist(){
+  if(!confirm('¿Desconectar la nube? Los datos locales se mantienen.'))return;
+  const s=getS();s.ghToken='';s.ghGist='';saveS(s);renderSettings();showToast('Nube desconectada');
+}
 function td(){return new Date().toISOString().slice(0,10);}
 
 let calDate=new Date(),timerInt=null,tHabit=null,tStart=null,tReqMin=60,txHabit=null;
@@ -775,6 +860,7 @@ function init(){
     s.today=today;s.done={};saveS(s);
   }
   renderHome();renderSettings();startCdwn();schedNotif();
+  bgSyncFromGist();
   // Ocultar splash
   setTimeout(()=>{
     const sp=document.getElementById('splash');
@@ -1320,8 +1406,14 @@ function renderSettings(){
   const times=s.notifTimes||[9,19,22];
   [0,1,2].forEach(i=>{const h=times[i];const el=document.getElementById('nt'+i);if(el)el.value=(h<10?'0'+h:h)+':00';});
   const sub=document.getElementById('notifSub');if(sub)sub.textContent=times.map(h=>(h<10?'0'+h:h)+':00').join(' · ');
-  buildSyncQR(s);
-  buildQRGrid(s);
+  buildSyncQR(s);buildQRGrid(s);
+  // Cloud status
+  const connected=!!(s.ghToken&&s.ghGist);
+  const gc=document.getElementById('ghConnected');const gd=document.getElementById('ghDisconnected');
+  if(gc)gc.style.display=connected?'block':'none';
+  if(gd)gd.style.display=connected?'none':'block';
+  const gl=document.getElementById('ghGistLink');
+  if(gl&&connected)gl.textContent='gist.github.com/…/'+s.ghGist.slice(0,8)+'…';
 }
 function buildSyncQR(s){
   const el=document.getElementById('syncQR');
