@@ -555,6 +555,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="qr-grid" id="qrGrid"></div>
   </div>
   <div class="set-sec">
+    <div class="set-sec-ttl">Copia de seguridad</div>
+    <div style="font-size:11px;color:var(--w3);margin-bottom:13px;line-height:1.6;font-weight:300">
+      Exporta tus datos para guardarlos o moverlos a otro dispositivo.
+    </div>
+    <button onclick="exportData()" style="width:100%;padding:13px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:9px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar datos
+    </button>
+    <label style="width:100%;padding:13px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:9px;box-sizing:border-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Importar datos
+      <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+    </label>
+  </div>
+  <div class="set-sec">
     <button class="danger-btn" onclick="doReset()">Borrar todos los datos</button>
   </div>
 </div>
@@ -1439,6 +1454,36 @@ function shareWA(){
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+function exportData(){
+  const s=getS();
+  const blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=url;a.download='modo-accion-'+date+'.json';
+  a.click();URL.revokeObjectURL(url);
+  showToast('✓ Datos exportados');
+}
+
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const imported=JSON.parse(ev.target.result);
+      if(!imported.token||imported.points===undefined)throw new Error('Formato inválido');
+      if(!confirm('¿Importar estos datos?\nSe reemplazarán los datos actuales.'))return;
+      // Asegurar campo reflections
+      if(!imported.reflections)imported.reflections={};
+      saveS(imported);
+      showToast('✓ Datos importados');
+      setTimeout(()=>location.reload(),800);
+    }catch(err){showToast('Error: archivo no válido');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
 function doReset(){
   if(!confirm('¿Borrar todos los datos?\nSe perderán hábitos, puntos y rachas.'))return;
   if(!confirm('Segunda confirmación — esto no se puede deshacer.\n¿Continuar?'))return;
