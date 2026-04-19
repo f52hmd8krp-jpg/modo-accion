@@ -290,6 +290,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .reflex-entry-date{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.5px;margin-bottom:6px}
 .reflex-entry-text{font-size:13px;color:var(--w2);line-height:1.6;font-weight:300}
 
+/* AUTH */
+#authScreen{position:fixed;inset:0;background:var(--bg);z-index:998;display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:4px;color:var(--w);margin-bottom:4px;text-align:center}
+.auth-logo em{color:var(--w3);font-style:normal;display:block;font-size:36px}
+.auth-bolt{margin-bottom:28px}
+.auth-card{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
+.auth-input{width:100%;padding:14px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;color:var(--w);font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
+.auth-input:focus{border-color:var(--b3)}
+.auth-input::placeholder{color:var(--w3)}
+.auth-btn-primary{width:100%;padding:15px;background:var(--w);border:none;border-radius:10px;color:var(--bg);font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px}
+.auth-btn-secondary{width:100%;padding:13px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w2);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer}
+.auth-toggle{font-size:12px;color:var(--w3);text-align:center;cursor:pointer;margin-top:4px}
+.auth-toggle span{color:var(--w2);text-decoration:underline}
+.auth-err{font-size:11px;color:#e05c5c;text-align:center;font-family:'DM Mono',monospace;min-height:16px}
+.auth-ok{font-size:11px;color:#7ec87e;text-align:center;font-family:'DM Mono',monospace;min-height:16px}
+
 /* SPLASH */
 #splash{position:fixed;inset:0;background:var(--bg);z-index:999;
   display:flex;align-items:center;justify-content:center;
@@ -355,6 +371,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 </style>
 </head>
 <body>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-bolt">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+      <path d="M13 2L4.5 13.5H11.5L11 22L19.5 10.5H12.5L13 2Z" fill="rgba(255,255,255,.9)" stroke="rgba(255,255,255,.3)" stroke-width=".5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="auth-logo">MODO<em>ACCIÓN</em></div>
+  <div style="font-size:12px;color:var(--w3);margin-bottom:36px;text-align:center;font-weight:300">Tu tracker de hábitos diario</div>
+  <div class="auth-card">
+    <input class="auth-input" type="email" id="authEmail" placeholder="tu@email.com" autocomplete="email">
+    <input class="auth-input" type="password" id="authPass" placeholder="Contraseña" autocomplete="current-password">
+    <div id="authMsg" class="auth-err"></div>
+    <button class="auth-btn-primary" id="authMainBtn" onclick="authSubmit()">Entrar</button>
+    <div class="auth-toggle" id="authToggle" onclick="toggleAuthMode()">¿No tienes cuenta? <span>Regístrate</span></div>
+  </div>
+</div>
 
 <!-- SPLASH SCREEN -->
 <div id="splash">
@@ -590,6 +624,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     </label>
   </div>
   <div class="set-sec">
+    <button onclick="signOut()" style="width:100%;padding:13px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w3);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px">Cerrar sesión</button>
     <button class="danger-btn" onclick="doReset()">Borrar todos los datos</button>
   </div>
 </div>
@@ -688,6 +723,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <div class="toast" id="toast"></div>
 
 <!-- jsQR cargado de forma segura con fallback -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="jsqr.min.js"></script>
 <script src="qrcode.min.js"></script>
 <script>
@@ -768,7 +804,7 @@ function getS(){
   return newS();
 }
 function newS(){return{points:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false],notifTimes:[9,19,22],reflections:{},ghToken:'',ghGist:'',lastSaved:0};}
-function saveS(s){s.lastSaved=Date.now();localStorage.setItem('ma_v5',JSON.stringify(s));pushToGist(s);}
+function saveS(s){s.lastSaved=Date.now();localStorage.setItem('ma_v5',JSON.stringify(s));pushToSupabase(s);pushToGist(s);}
 
 async function pushToGist(s){
   if(!s.ghToken||!s.ghGist)return;
@@ -1583,7 +1619,101 @@ function doReset(){
 }
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
-init();
+
+// ═══ SUPABASE ═══
+const SUPA_URL='https://mifhfeiuekhxmyvjnpkx.supabase.co';
+const SUPA_KEY='sb_publishable_AhKd7jVw2SMB6doBBSpWQQ_u2r8fVqf';
+let _supa=null;
+function getSupa(){if(!_supa&&window.supabase)_supa=window.supabase.createClient(SUPA_URL,SUPA_KEY);return _supa;}
+
+let _authMode='login'; // 'login' | 'signup'
+function toggleAuthMode(){
+  _authMode=_authMode==='login'?'signup':'login';
+  document.getElementById('authMainBtn').textContent=_authMode==='login'?'Entrar':'Crear cuenta';
+  document.getElementById('authToggle').innerHTML=_authMode==='login'?'¿No tienes cuenta? <span>Regístrate</span>':'¿Ya tienes cuenta? <span>Entrar</span>';
+  document.getElementById('authMsg').textContent='';
+}
+function setAuthMsg(msg,ok){const el=document.getElementById('authMsg');el.textContent=msg;el.className=ok?'auth-ok':'auth-err';}
+
+async function authSubmit(){
+  const sc=getSupa();if(!sc){setAuthMsg('Error cargando cliente');return;}
+  const email=(document.getElementById('authEmail').value||'').trim();
+  const pass=document.getElementById('authPass').value||'';
+  if(!email||!pass){setAuthMsg('Rellena email y contraseña');return;}
+  document.getElementById('authMainBtn').disabled=true;
+  if(_authMode==='login'){
+    const{error}=await sc.auth.signInWithPassword({email,password:pass});
+    if(error){setAuthMsg(error.message==='Invalid login credentials'?'Email o contraseña incorrectos':error.message);document.getElementById('authMainBtn').disabled=false;return;}
+    onAuthOk();
+  } else {
+    const{error}=await sc.auth.signUp({email,password:pass});
+    if(error){setAuthMsg(error.message);document.getElementById('authMainBtn').disabled=false;return;}
+    setAuthMsg('✓ Revisa tu email para confirmar la cuenta',true);
+    document.getElementById('authMainBtn').disabled=false;
+  }
+}
+
+async function onAuthOk(){
+  document.getElementById('authScreen').style.display='none';
+  await syncFromSupabase();
+  init();
+}
+
+async function syncFromSupabase(){
+  try{
+    const sc=getSupa();if(!sc)return;
+    const{data:{user}}=await sc.auth.getUser();if(!user)return;
+    const{data,error}=await sc.from('user_data').select('data').eq('id',user.id).single();
+    if(error||!data){
+      // Primera vez: sube datos locales
+      const local=getS();
+      await sc.from('user_data').upsert({id:user.id,data:local,updated_at:new Date().toISOString()});
+      return;
+    }
+    const cloud=data.data;const local=getS();
+    if((cloud.lastSaved||0)>(local.lastSaved||0)){
+      if(!cloud.reflections)cloud.reflections={};
+      localStorage.setItem('ma_v5',JSON.stringify(cloud));
+      showToast('☁ Datos restaurados desde la nube');
+    } else {
+      await sc.from('user_data').upsert({id:user.id,data:local,updated_at:new Date().toISOString()});
+    }
+  }catch(e){}
+}
+
+async function pushToSupabase(s){
+  try{
+    const sc=getSupa();if(!sc)return;
+    const{data:{user}}=await sc.auth.getUser();if(!user)return;
+    await sc.from('user_data').upsert({id:user.id,data:s,updated_at:new Date().toISOString()});
+  }catch(e){}
+}
+
+async function signOut(){
+  if(!confirm('¿Cerrar sesión?'))return;
+  const sc=getSupa();if(sc)await sc.auth.signOut();
+  localStorage.removeItem('ma_v5');
+  location.reload();
+}
+
+async function startApp(){
+  const sc=getSupa();
+  if(!sc){init();return;}
+  const{data:{session}}=await sc.auth.getSession();
+  if(session){
+    await syncFromSupabase();
+    init();
+  } else {
+    // Mostrar pantalla de auth (tras el splash)
+    setTimeout(()=>{
+      const sp=document.getElementById('splash');
+      if(sp){sp.classList.add('hide');setTimeout(()=>sp.remove(),520);}
+      document.getElementById('authScreen').style.display='flex';
+    },1100);
+  }
+}
+
+startApp();
 </script>
 </body>
 </html>
