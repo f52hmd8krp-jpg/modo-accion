@@ -577,9 +577,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <div id="syncQR" style="background:#fff;padding:8px;border-radius:8px;display:inline-block"></div>
       <div style="font-size:9px;color:var(--w3);letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace">Token: <span id="tkDisplay" style="color:var(--w2);letter-spacing:3px"></span></div>
     </div>
-    <button onclick="copySyncLink()" style="width:100%;padding:13px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w3);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px;margin-bottom:4px">
+    <button onclick="copySyncLink()" style="width:100%;padding:13px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w3);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px;margin-bottom:12px">
       Copiar enlace de sincronización
     </button>
+    <div style="font-size:11px;color:var(--w3);margin-bottom:8px;line-height:1.6;font-weight:300">
+      ¿Tienes QR impresos con otro token? Introdúcelo aquí para restaurarlo.
+    </div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="tokenRestoreIn" class="wa-input" placeholder="Ej: A1B2C3D4" maxlength="8" style="flex:1;text-transform:uppercase;font-family:'DM Mono',monospace;letter-spacing:2px">
+      <button onclick="restoreToken()" style="padding:13px 16px;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--w2);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap">Restaurar</button>
+    </div>
   </div>
   <div class="set-sec">
     <div class="set-sec-ttl">Códigos QR</div>
@@ -1170,8 +1177,11 @@ function onQRFound(data){
   const s=getS();
   const appToken=(s.token||'').toUpperCase();
   if(qrToken && appToken && qrToken!==appToken){
-    showToast('❌ Token incorrecto — sincroniza primero');
-    console.warn('[QR] Token mismatch — QR:',qrToken,' App:',appToken);
+    if(confirm('Este QR tiene el token "'+qrToken+'".\n¿Restaurar tu token para que funcionen todos tus QR impresos?')){
+      s.token=qrToken;saveS(s);renderSettings();
+      showToast('✓ Token restaurado: '+qrToken);
+      goTo('home');setTimeout(()=>finishHabit(h.id,{qr:true}),300);
+    }
     return;
   }
   // Verificar si ya está completado hoy
@@ -1469,6 +1479,16 @@ function loadQRLib(cb){
   s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
   s.onload=cb;document.head.appendChild(s);
 }
+async function restoreToken(){
+  const input=(document.getElementById('tokenRestoreIn').value||'').trim().toUpperCase();
+  if(input.length<4){showToast('Token demasiado corto');return;}
+  if(!confirm('¿Restaurar token a "'+input+'"?\nTus QR impresos con ese token volverán a funcionar.'))return;
+  const s=getS();s.token=input;
+  saveS(s);
+  renderSettings();
+  showToast('✓ Token restaurado: '+input);
+}
+
 function copySyncLink(){
   const s=getS();
   const url=location.origin+location.pathname+'?token='+s.token;
