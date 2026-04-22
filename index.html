@@ -1659,24 +1659,37 @@ async function onAuthOk(){
   init();
 }
 
+function stableToken(uid){
+  // Token fijo derivado del user ID — nunca cambia
+  return uid.replace(/-/g,'').substring(0,8).toUpperCase();
+}
+
 async function syncFromSupabase(){
   try{
     const sc=getSupa();if(!sc)return;
     const{data:{user}}=await sc.auth.getUser();if(!user)return;
+    const token=stableToken(user.id);
     const{data,error}=await sc.from('user_data').select('data').eq('id',user.id).single();
     if(error||!data){
-      // Primera vez: sube datos locales
-      const local=getS();
+      // Primera vez: sube datos locales con token estable
+      const local=getS();local.token=token;
+      localStorage.setItem('ma_v5',JSON.stringify(local));
       await sc.from('user_data').upsert({id:user.id,data:local,updated_at:new Date().toISOString()});
       return;
     }
     const cloud=data.data;const local=getS();
+    let s;
     if((cloud.lastSaved||0)>(local.lastSaved||0)){
       if(!cloud.reflections)cloud.reflections={};
-      localStorage.setItem('ma_v5',JSON.stringify(cloud));
-      showToast('☁ Datos restaurados desde la nube');
+      s=cloud;
     } else {
-      await sc.from('user_data').upsert({id:user.id,data:local,updated_at:new Date().toISOString()});
+      s=local;
+    }
+    // Siempre asegurar token estable
+    s.token=token;
+    localStorage.setItem('ma_v5',JSON.stringify(s));
+    if(s===local){
+      await sc.from('user_data').upsert({id:user.id,data:s,updated_at:new Date().toISOString()});
     }
   }catch(e){}
 }
