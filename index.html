@@ -387,6 +387,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div id="authMsg" class="auth-err"></div>
     <button class="auth-btn-primary" id="authMainBtn" onclick="authSubmit()">Entrar</button>
     <div class="auth-toggle" id="authToggle" onclick="toggleAuthMode()">¿No tienes cuenta? <span>Regístrate</span></div>
+    <div class="auth-toggle" id="authForgot" onclick="resetPassword()" style="margin-top:2px">¿Olvidaste la contraseña? <span>Recuperar</span></div>
   </div>
 </div>
 
@@ -542,6 +543,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <!-- SETTINGS -->
 <div id="s-settings" class="screen">
   <div class="set-hdr"><div class="set-title">Ajustes</div></div>
+  <div style="margin:0 22px 20px;padding:12px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;display:flex;align-items:center;gap:12px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <div>
+      <div style="font-size:10px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.5px;margin-bottom:2px">CUENTA</div>
+      <div style="font-size:13px;color:var(--w2)" id="userEmailDisplay">—</div>
+    </div>
+  </div>
   <div class="set-sec">
     <div class="set-sec-ttl">Recordatorios</div>
     <div class="set-row">
@@ -1455,6 +1463,9 @@ function renderSettings(){
   [0,1,2].forEach(i=>{const h=times[i];const el=document.getElementById('nt'+i);if(el)el.value=(h<10?'0'+h:h)+':00';});
   const sub=document.getElementById('notifSub');if(sub)sub.textContent=times.map(h=>(h<10?'0'+h:h)+':00').join(' · ');
   buildSyncQR(s);buildQRGrid(s);
+  // Email del usuario
+  const sc=getSupa();
+  if(sc){sc.auth.getUser().then(({data:{user}})=>{const el=document.getElementById('userEmailDisplay');if(el&&user)el.textContent=user.email;});};
   // Cloud status
   const connected=!!(s.ghToken&&s.ghGist);
   const gc=document.getElementById('ghConnected');const gd=document.getElementById('ghDisconnected');
@@ -1653,9 +1664,19 @@ function toggleAuthMode(){
   _authMode=_authMode==='login'?'signup':'login';
   document.getElementById('authMainBtn').textContent=_authMode==='login'?'Entrar':'Crear cuenta';
   document.getElementById('authToggle').innerHTML=_authMode==='login'?'¿No tienes cuenta? <span>Regístrate</span>':'¿Ya tienes cuenta? <span>Entrar</span>';
+  document.getElementById('authForgot').style.display=_authMode==='login'?'block':'none';
   document.getElementById('authMsg').textContent='';
 }
 function setAuthMsg(msg,ok){const el=document.getElementById('authMsg');el.textContent=msg;el.className=ok?'auth-ok':'auth-err';}
+
+async function resetPassword(){
+  const email=(document.getElementById('authEmail').value||'').trim();
+  if(!email){setAuthMsg('Escribe tu email primero');return;}
+  const sc=getSupa();if(!sc)return;
+  const{error}=await sc.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+  if(error){setAuthMsg(error.message);return;}
+  setAuthMsg('✓ Email de recuperación enviado — revisa tu bandeja',true);
+}
 
 async function authSubmit(){
   const sc=getSupa();if(!sc){setAuthMsg('Error cargando cliente');return;}
