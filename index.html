@@ -2818,6 +2818,13 @@ async function submitNewPassword(){
   setTimeout(()=>{location.hash='';location.reload();},1500);
 }
 
+// Bloquear zoom (iOS ignora user-scalable=no)
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault();},{passive:false});
+let _lt=0;
+document.addEventListener('touchend',e=>{const now=Date.now();if(now-_lt<300)e.preventDefault();_lt=now;},{passive:false});
+
 startApp();
 </script>
 </body>
