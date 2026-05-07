@@ -425,38 +425,67 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 @keyframes particleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
 /* ═══ PODIO ═══ */
-.podium-scene{padding:16px 14px 0}
-.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.podium-scene{padding:20px 12px 0;position:relative}
+/* Glow ambiental detrás del 1° */
+.podium-scene::before{content:'';position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(240,192,64,.13) 0%,transparent 65%);pointer-events:none;z-index:0}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:6px;position:relative;z-index:1}
 /* Columnas */
 .pod-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
-.pod-1{flex:1.12}
-/* Info sobre plataforma */
-.pod-info{text-align:center;padding-bottom:10px;width:100%;animation:podIn .5s ease both}
-@keyframes podIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.pod-star{font-size:15px;color:#f0c040;margin-bottom:1px}
-.pod-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--w);line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-.pod-1 .pod-name{font-size:23px}
-.pod-pts{font-family:'Bebas Neue',sans-serif;font-size:29px;line-height:1.15;color:var(--w)}
-.pod-1 .pod-pts{font-size:35px}
-.pod-pts em{font-family:'DM Mono',monospace;font-size:8px;color:var(--w3);letter-spacing:.5px;margin-left:1px;vertical-align:middle;font-style:normal}
-.pod-meta{font-size:7px;font-family:'DM Mono',monospace;color:var(--w3);letter-spacing:.3px;margin-top:1px}
-/* Bloques de plataforma */
-.pod-block{width:100%;border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;animation:podRise .65s cubic-bezier(.34,1.2,.64,1) both}
-@keyframes podRise{from{transform:translateY(110%);opacity:0}to{transform:none;opacity:1}}
-.pod-block::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.22);border-radius:6px 6px 0 0;z-index:1}
-.pod-1 .pod-block{height:165px;animation-delay:.05s;background:linear-gradient(170deg,#f0c840 0%,#b07c18 100%);box-shadow:8px 8px 0 #6a4a08}
-.pod-2 .pod-block{height:115px;animation-delay:.15s;background:linear-gradient(170deg,#d4e0ee 0%,#7888a4 100%);box-shadow:8px 8px 0 #3a4858}
-.pod-3 .pod-block{height:85px;animation-delay:.25s;background:linear-gradient(170deg,#e8a050 0%,#985020 100%);box-shadow:8px 8px 0 #582c08}
-.pod-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:rgba(0,0,0,.18);user-select:none;letter-spacing:-1px;position:relative;z-index:0}
-.pod-1 .pod-num{font-size:66px}
+.pod-1{flex:1.14}
+/* Tarjetas de info - glass orgánico */
+.pod-info{
+  text-align:center;padding:10px 10px 12px;width:100%;box-sizing:border-box;
+  border-radius:16px;margin-bottom:10px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.04);
+  animation:podIn .55s cubic-bezier(.34,1.1,.64,1) both
+}
+.pod-1 .pod-info{border-color:rgba(240,192,64,.28);background:rgba(240,192,64,.08);border-radius:18px 16px 14px 17px}
+.pod-2 .pod-info{border-radius:14px 18px 16px 13px;transform:rotate(-1.8deg) translateY(4px)}
+.pod-3 .pod-info{border-radius:17px 13px 15px 18px;transform:rotate(1.6deg) translateY(6px)}
+@keyframes podIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.pod-2 .pod-info,.pod-3 .pod-info{animation:none;opacity:1}
+.pod-star{font-size:17px;color:#f0c040;margin-bottom:2px;filter:drop-shadow(0 0 6px rgba(240,192,64,.6))}
+.pod-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--w);line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.pod-1 .pod-name{font-size:22px}
+.pod-pts{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1.2;color:var(--w)}
+.pod-1 .pod-pts{font-size:36px}
+.pod-pts em{font-family:'DM Mono',monospace;font-size:8px;color:var(--w3);letter-spacing:.5px;margin-left:2px;vertical-align:middle;font-style:normal}
+.pod-meta{font-size:7px;font-family:'DM Mono',monospace;color:var(--w3);letter-spacing:.3px;margin-top:2px;line-height:1.5}
+/* Bloques de plataforma - orgánicos con glow */
+.pod-block{width:100%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;animation:podRise .7s cubic-bezier(.34,1.15,.64,1) both}
+@keyframes podRise{from{transform:translateY(115%);opacity:0}to{transform:none;opacity:1}}
+/* Brillo en el tope de cada plataforma */
+.pod-block::before{content:'';position:absolute;top:0;left:10%;right:10%;height:3px;background:rgba(255,255,255,.35);border-radius:0 0 50% 50%;filter:blur(2px);z-index:2}
+.pod-1 .pod-block{
+  height:168px;border-radius:18px 14px 0 0;animation-delay:.05s;
+  background:linear-gradient(155deg,#f5d268 0%,#c08820 100%);
+  box-shadow:0 -8px 36px rgba(240,192,64,.32),0 0 0 1px rgba(240,192,64,.18),7px 7px 0 #7a5210
+}
+.pod-2 .pod-block{
+  height:118px;border-radius:14px 18px 0 0;animation-delay:.14s;
+  background:linear-gradient(155deg,#dce8f5 0%,#8090ac 100%);
+  box-shadow:0 -4px 20px rgba(180,200,230,.18),6px 6px 0 #3c4c60
+}
+.pod-3 .pod-block{
+  height:88px;border-radius:16px 12px 0 0;animation-delay:.22s;
+  background:linear-gradient(155deg,#eeaa58 0%,#9a5222 100%);
+  box-shadow:0 -4px 18px rgba(220,140,80,.16),6px 6px 0 #5c2e0a
+}
+.pod-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:rgba(0,0,0,.16);user-select:none;letter-spacing:-1px;position:relative;z-index:0}
+.pod-1 .pod-num{font-size:68px}
 /* Suelo */
-.pod-floor{height:3px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.14) 25%,rgba(255,255,255,.14) 75%,transparent 100%);margin:0 0 20px}
+.pod-floor{height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18) 30%,rgba(255,255,255,.18) 70%,transparent);margin:0 0 22px;border-radius:2px}
 /* Lista 4°+ */
-.pod-rest{padding:0 2px}
-.pod-rest-row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-bottom:1px solid var(--b1);animation:podIn .4s ease both}
-.pod-rest-pos{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--w3);width:24px;flex-shrink:0;text-align:center}
+.pod-rest{padding:0 4px}
+.pod-rest-row{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;margin-bottom:6px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;animation:podIn .4s ease both
+}
+.pod-rest-pos{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--w3);width:22px;flex-shrink:0;text-align:center}
 .pod-rest-name{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--w);flex:1;letter-spacing:1.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pod-rest-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--w3);text-align:right;flex-shrink:0}
+.pod-rest-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--w3);text-align:right;flex-shrink:0;line-height:1.6}
 
 /* ═══ WIZARD GRUPO ═══ */
 .wizard-steps{display:flex;gap:6px;margin-bottom:22px;justify-content:center}
