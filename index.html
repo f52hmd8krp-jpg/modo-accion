@@ -424,41 +424,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .lvl-particle{position:absolute;border-radius:50%;animation:particleFly 1.4s ease-out forwards}
 @keyframes particleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
-/* ═══ ARENA ═══ */
-.arena-wrap{padding:0 22px 20px}
-.arena-card{position:relative;border-radius:16px;padding:16px 16px 14px;margin-bottom:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--b1)}
-.arena-card.pos1{border-color:rgba(240,192,64,.35);background:linear-gradient(140deg,rgba(240,192,64,.07) 0%,var(--s1) 55%)}
-.arena-card.pos2{border-color:rgba(200,210,220,.2);background:linear-gradient(140deg,rgba(200,210,220,.04) 0%,var(--s1) 55%)}
-.arena-card.pos3{border-color:rgba(200,120,64,.25);background:linear-gradient(140deg,rgba(200,120,64,.05) 0%,var(--s1) 55%)}
-.arena-card.posN{background:var(--s1)}
-/* Watermark número posición */
-.arena-wm{position:absolute;right:-8px;top:-16px;font-family:'Bebas Neue',sans-serif;font-size:130px;line-height:1;color:rgba(255,255,255,.03);pointer-events:none;user-select:none;letter-spacing:-4px}
-.arena-card.pos1 .arena-wm{color:rgba(240,192,64,.06)}
-.arena-card.pos2 .arena-wm{color:rgba(200,210,220,.04)}
-.arena-card.pos3 .arena-wm{color:rgba(200,120,64,.05)}
-/* Layout interno */
-.arena-inner{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-.arena-fig{width:72px;height:86px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center}
-.arena-right{flex:1;min-width:0}
-.arena-rank-label{font-size:8px;letter-spacing:2.5px;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:1px}
-.arena-rank-label.gold{color:rgba(240,192,64,.7)}
-.arena-rank-label.silver{color:rgba(200,210,220,.5)}
-.arena-rank-label.bronze{color:rgba(200,120,64,.6)}
-.arena-rank-label.other{color:var(--w3)}
-.arena-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--w);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-.arena-pts-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
-.arena-pts{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;letter-spacing:1px;color:var(--w)}
-.arena-pts-lbl{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.5px}
-.arena-meta{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.4px}
-.arena-bar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;margin-top:10px;position:relative;z-index:1}
-.arena-bar-fill{height:2px;border-radius:1px;transition:width 1.6s cubic-bezier(.34,1.1,.64,1)}
-/* Figura animaciones */
-@keyframes figFloat{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-7px) rotate(-2deg)}70%{transform:translateY(-4px) rotate(1deg)}}
-@keyframes figRun{0%,100%{transform:rotate(-2deg) translateX(0)}50%{transform:rotate(2deg) translateX(2px)}}
-@keyframes figBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
-.fig-celebrate{animation:figFloat 1.8s ease-in-out infinite;transform-origin:bottom center}
-.fig-run{animation:figRun .7s ease-in-out infinite;transform-origin:bottom center}
-.fig-rest{animation:figBreath 3s ease-in-out infinite;transform-origin:bottom center}
+/* ═══ PODIO ═══ */
+.podium-scene{padding:16px 14px 0}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+/* Columnas */
+.pod-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+.pod-1{flex:1.12}
+/* Info sobre plataforma */
+.pod-info{text-align:center;padding-bottom:10px;width:100%;animation:podIn .5s ease both}
+@keyframes podIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pod-star{font-size:15px;color:#f0c040;margin-bottom:1px}
+.pod-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--w);line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.pod-1 .pod-name{font-size:23px}
+.pod-pts{font-family:'Bebas Neue',sans-serif;font-size:29px;line-height:1.15;color:var(--w)}
+.pod-1 .pod-pts{font-size:35px}
+.pod-pts em{font-family:'DM Mono',monospace;font-size:8px;color:var(--w3);letter-spacing:.5px;margin-left:1px;vertical-align:middle;font-style:normal}
+.pod-meta{font-size:7px;font-family:'DM Mono',monospace;color:var(--w3);letter-spacing:.3px;margin-top:1px}
+/* Bloques de plataforma */
+.pod-block{width:100%;border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;animation:podRise .65s cubic-bezier(.34,1.2,.64,1) both}
+@keyframes podRise{from{transform:translateY(110%);opacity:0}to{transform:none;opacity:1}}
+.pod-block::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:rgba(255,255,255,.22);border-radius:6px 6px 0 0;z-index:1}
+.pod-1 .pod-block{height:165px;animation-delay:.05s;background:linear-gradient(170deg,#f0c840 0%,#b07c18 100%);box-shadow:8px 8px 0 #6a4a08}
+.pod-2 .pod-block{height:115px;animation-delay:.15s;background:linear-gradient(170deg,#d4e0ee 0%,#7888a4 100%);box-shadow:8px 8px 0 #3a4858}
+.pod-3 .pod-block{height:85px;animation-delay:.25s;background:linear-gradient(170deg,#e8a050 0%,#985020 100%);box-shadow:8px 8px 0 #582c08}
+.pod-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:rgba(0,0,0,.18);user-select:none;letter-spacing:-1px;position:relative;z-index:0}
+.pod-1 .pod-num{font-size:66px}
+/* Suelo */
+.pod-floor{height:3px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.14) 25%,rgba(255,255,255,.14) 75%,transparent 100%);margin:0 0 20px}
+/* Lista 4°+ */
+.pod-rest{padding:0 2px}
+.pod-rest-row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-bottom:1px solid var(--b1);animation:podIn .4s ease both}
+.pod-rest-pos{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--w3);width:24px;flex-shrink:0;text-align:center}
+.pod-rest-name{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--w);flex:1;letter-spacing:1.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod-rest-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--w3);text-align:right;flex-shrink:0}
 
 /* ═══ WIZARD GRUPO ═══ */
 .wizard-steps{display:flex;gap:6px;margin-bottom:22px;justify-content:center}
@@ -819,8 +817,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div class="slbl">Grupo</div>
   <div id="socGroup" style="padding:0 22px 8px"></div>
   <div id="socStreak"></div>
-  <div class="slbl" id="socRaceLbl" style="display:none">Arena</div>
-  <div id="socRace" class="arena-wrap" style="display:none"></div>
+  <div class="slbl" id="socRaceLbl" style="display:none">Podio</div>
+  <div id="socRace" style="display:none"></div>
   <div class="slbl" id="socChallengeLbl" style="display:none">Reto de la semana</div>
   <div id="socChallenge" style="padding:0 22px 4px"></div>
   <div class="slbl" id="socFeedLbl" style="display:none">Actividad reciente</div>
@@ -2604,73 +2602,53 @@ async function fetchGroupData(groupCode){
       chalEl.innerHTML=chalHtml;
     }
 
-    // — Arena —
+    // — Podio —
     const raceEl=document.getElementById('socRace');
     const raceLbl=document.getElementById('socRaceLbl');
     if(raceEl&&raceLbl){
       raceLbl.style.display='block';raceEl.style.display='block';
-      const maxPts=Math.max(...data.map(r=>r.points||0),1);
       const myS=getS();const myName=myS.displayName||(myS.token||'');
-      const posClass=(p)=>p===1?'pos1':p===2?'pos2':p===3?'pos3':'posN';
-      const rankLbl=(p)=>p===1?{cls:'gold',txt:'1° LUGAR'}:p===2?{cls:'silver',txt:'2° LUGAR'}:p===3?{cls:'bronze',txt:'3° LUGAR'}:{cls:'other',txt:'#'+p+' PUESTO'};
-      const figColor=(p)=>p===1?'#f0c040':p===2?'#c8d4e0':p===3?'#e09040':'rgba(255,255,255,.45)';
-      function figSVG(pose,color){
-        if(pose==='celebrate')return`<svg viewBox="0 0 60 80" width="56" height="76" fill="${color}">
-          <circle cx="30" cy="8" r="7"/>
-          <polygon points="20,16 40,16 38,42 22,42"/>
-          <polygon points="20,20 8,6 5,10 17,26"/>
-          <polygon points="40,20 52,6 55,10 43,26"/>
-          <polygon points="22,42 20,70 26,70 28,44"/>
-          <polygon points="38,42 40,70 34,70 32,44"/>
-        </svg>`;
-        if(pose==='run')return`<svg viewBox="0 0 60 80" width="56" height="76" fill="${color}">
-          <circle cx="34" cy="8" r="7"/>
-          <polygon points="24,16 44,18 40,42 22,38"/>
-          <polygon points="24,22 8,30 10,36 26,28"/>
-          <polygon points="40,22 54,14 56,20 42,28"/>
-          <polygon points="22,40 14,62 20,64 28,44"/>
-          <polygon points="36,42 44,68 38,70 32,44"/>
-        </svg>`;
-        return`<svg viewBox="0 0 60 80" width="56" height="76" fill="${color}">
-          <circle cx="30" cy="8" r="7"/>
-          <polygon points="22,16 38,16 36,42 24,42"/>
-          <polygon points="22,18 14,42 20,44 26,22"/>
-          <polygon points="38,18 46,42 40,44 34,22"/>
-          <polygon points="24,42 20,72 26,72 28,44"/>
-          <polygon points="36,42 40,72 34,72 32,44"/>
-        </svg>`;
-      }
-      raceEl.innerHTML=data.map((r,i)=>{
-        const pos=i+1;
-        const name=r.display_name||'Usuario';
+      const top3=data.slice(0,3);
+      const rest=data.slice(3);
+      function podCol(r,pos,colCls,infoDelay,blockDelay){
+        if(!r)return`<div class="pod-col ${colCls}"><div class="pod-block" style="animation-delay:${blockDelay}"><span class="pod-num">${pos}</span></div></div>`;
+        const name=r.display_name||'—';
         const pts=r.points||0;
         const habitsToday=(r.habits_today||[]).length;
         const streak=r.streak||0;
         const isMe=name===myName;
-        const pose=habitsToday>=H.length?'celebrate':habitsToday>0?'run':'rest';
-        const color=figColor(pos);
-        const pc=posClass(pos);
-        const rl=rankLbl(pos);
-        const pct=Math.round((pts/maxPts)*100);
-        return`<div class="arena-card ${pc}">
-          <div class="arena-wm">${pos}</div>
-          <div class="arena-inner">
-            <div class="arena-fig">
-              <div class="fig-${pose}">${figSVG(pose,color)}</div>
-            </div>
-            <div class="arena-right">
-              <div class="arena-rank-label ${rl.cls}">${rl.txt}</div>
-              <div class="arena-name">${name}${isMe?' · TÚ':''}</div>
-              <div class="arena-pts-row">
-                <div class="arena-pts">${pts}</div>
-                <div class="arena-pts-lbl">PTS TOTALES</div>
-              </div>
-              <div class="arena-meta">${habitsToday}/${H.length} hábitos hoy · racha ${streak}d</div>
-              <div class="arena-bar"><div class="arena-bar-fill" style="width:${pct}%;background:${color};box-shadow:0 0 6px ${color}40"></div></div>
-            </div>
+        const star=pos===1?`<div class="pod-star">★</div>`:'';
+        return`<div class="pod-col ${colCls}">
+          <div class="pod-info" style="animation-delay:${infoDelay}">
+            ${star}
+            <div class="pod-name">${name}${isMe?' · TÚ':''}</div>
+            <div class="pod-pts">${pts}<em>pts</em></div>
+            <div class="pod-meta">${habitsToday}/${H.length} hoy · ${streak}d racha</div>
+          </div>
+          <div class="pod-block" style="animation-delay:${blockDelay}">
+            <span class="pod-num">${pos}</span>
           </div>
         </div>`;
-      }).join('');
+      }
+      const restHTML=rest.length?`<div class="pod-rest">${rest.map((r,i)=>{
+        const pos=i+4;const name=r.display_name||'—';const pts=r.points||0;
+        const habitsToday=(r.habits_today||[]).length;const streak=r.streak||0;
+        const isMe=name===myName;
+        return`<div class="pod-rest-row" style="animation-delay:${.08*(i+1)}s">
+          <span class="pod-rest-pos">${pos}</span>
+          <span class="pod-rest-name">${name}${isMe?' · TÚ':''}</span>
+          <span class="pod-rest-meta">${pts}pts · ${habitsToday}/${H.length}hoy · ${streak}d</span>
+        </div>`;
+      }).join('')}</div>`:'';
+      raceEl.innerHTML=`<div class="podium-scene">
+        <div class="podium-stage">
+          ${podCol(top3[1],2,'pod-2','.45s','.15s')}
+          ${podCol(top3[0],1,'pod-1','.28s','.05s')}
+          ${podCol(top3[2],3,'pod-3','.55s','.25s')}
+        </div>
+        <div class="pod-floor"></div>
+        ${restHTML}
+      </div>`;
     }
 
     // — Feed —

@@ -1,4 +1,4 @@
-const CACHE = 'modo-accion-v20';
+const CACHE = 'modo-accion-v21';
 const ASSETS = [
   '/modo-accion/',
   '/modo-accion/index.html',
