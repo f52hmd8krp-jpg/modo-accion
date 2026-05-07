@@ -424,6 +424,53 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .lvl-particle{position:absolute;border-radius:50%;animation:particleFly 1.4s ease-out forwards}
 @keyframes particleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
+/* ═══ CARRERA VISUAL ═══ */
+.race-wrap{padding:0 22px 20px}
+.race-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.race-medal{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;flex-shrink:0;letter-spacing:0}
+.race-medal.p1{background:rgba(240,192,64,.12);color:#f0c040;border:1px solid rgba(240,192,64,.3)}
+.race-medal.p2{background:rgba(176,184,196,.08);color:#b0b8c4;border:1px solid rgba(176,184,196,.2)}
+.race-medal.p3{background:rgba(200,120,64,.08);color:#c87840;border:1px solid rgba(200,120,64,.2)}
+.race-medal.pN{background:var(--s2);color:var(--w3);border:1px solid var(--b1)}
+.race-center{flex:1;min-width:0}
+.race-name-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.race-name{font-size:12px;color:var(--w2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.race-pts{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--w);letter-spacing:1px}
+.race-track{position:relative;height:28px}
+.race-track-bg{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--b1);border-radius:1px}
+.race-track-fill{position:absolute;bottom:0;left:0;height:2px;border-radius:1px;transition:width 1.2s cubic-bezier(.34,1.1,.64,1);min-width:2px}
+.race-runner{position:absolute;bottom:2px;transform:translateX(-50%);transition:left 1.2s cubic-bezier(.34,1.1,.64,1);display:flex;flex-direction:column;align-items:center;gap:1px}
+.race-runner-label{font-size:7px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.3px;white-space:nowrap}
+.race-sub{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.3px}
+@keyframes runnerBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-2px)}}
+.race-runner.leader{animation:runnerBounce 1s ease-in-out infinite}
+
+/* ═══ WIZARD GRUPO ═══ */
+.wizard-steps{display:flex;gap:6px;margin-bottom:22px;justify-content:center}
+.wstep{width:28px;height:3px;border-radius:2px;background:var(--b2);transition:background .3s}
+.wstep.on{background:var(--w)}
+.wizard-page{display:none}.wizard-page.on{display:block}
+.habit-check-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--b1);cursor:pointer}
+.habit-check-row:last-child{border-bottom:none}
+.habit-check-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.habit-check-icon svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.habit-check-name{flex:1;font-size:13px;color:var(--w2)}
+.habit-check-pts{font-size:10px;color:var(--w3);font-family:'DM Mono',monospace}
+.hcheck-box{width:20px;height:20px;border-radius:5px;border:1px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.hcheck-box.on{background:var(--w);border-color:var(--w)}
+.hcheck-box svg{width:11px;height:11px;stroke:var(--bg);stroke-width:2.5;stroke-linecap:round;fill:none}
+.dur-btn{width:100%;padding:14px;background:transparent;border:1px solid var(--b1);border-radius:10px;color:var(--w2);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;transition:all .2s}
+.dur-btn.on{border-color:var(--w);color:var(--w)}
+.dur-btn span{font-size:10px;color:var(--w3);font-family:'DM Mono',monospace}
+.dur-btn.on span{color:var(--w2)}
+
+/* ═══ REGLAS PANEL ═══ */
+.rule-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--b1)}
+.rule-item:last-child{border-bottom:none}
+.rule-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--w3);line-height:1;flex-shrink:0;width:20px}
+.rule-txt{font-size:13px;color:var(--w2);line-height:1.5;font-weight:300}
+.rule-txt strong{color:var(--w);font-weight:500}
+
 /* ═══ STREAK ROTA MODAL ═══ */
 #streakLostModal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;padding:32px;background:rgba(0,0,0,.97)}
 #streakLostModal.show{display:flex;animation:lvlFadeIn .4s ease forwards}
@@ -757,10 +804,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div class="slbl">Grupo</div>
   <div id="socGroup" style="padding:0 22px 8px"></div>
   <div id="socStreak"></div>
+  <div class="slbl" id="socRaceLbl" style="display:none">Carrera</div>
+  <div id="socRace" class="race-wrap" style="display:none"></div>
   <div class="slbl" id="socChallengeLbl" style="display:none">Reto de la semana</div>
   <div id="socChallenge" style="padding:0 22px 4px"></div>
-  <div class="slbl" id="socRankLbl" style="display:none">Ranking</div>
-  <div id="socRank" style="padding:0 22px"></div>
   <div class="slbl" id="socFeedLbl" style="display:none">Actividad reciente</div>
   <div id="socFeed" style="padding:0 22px 80px"></div>
 </div>
@@ -781,6 +828,84 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     </div>
     <button class="btn btn-w" onclick="submitChallenge()">Crear reto</button>
     <button class="btn btn-g" onclick="document.getElementById('mChallenge').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: CREAR GRUPO WIZARD -->
+<div class="mbd" id="mGroupSetup">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <div class="m-handle"></div>
+    <div class="wizard-steps">
+      <div class="wstep on" id="ws1"></div>
+      <div class="wstep" id="ws2"></div>
+      <div class="wstep" id="ws3"></div>
+      <div class="wstep" id="ws4"></div>
+    </div>
+
+    <!-- Paso 1: nombre -->
+    <div class="wizard-page on" id="wp1">
+      <div class="m-title">Nombre</div>
+      <div class="m-sub">¿Cómo se llama esta competición?</div>
+      <input class="wa-input" id="compNameIn" placeholder="ej. Reto de enero" maxlength="28" style="margin-bottom:20px">
+      <button class="btn btn-w" onclick="wizardNext(1)">Siguiente</button>
+    </div>
+
+    <!-- Paso 2: hábitos -->
+    <div class="wizard-page" id="wp2">
+      <div class="m-title">Hábitos</div>
+      <div class="m-sub">¿Qué hábitos cuentan en este grupo?</div>
+      <div id="habitCheckList" style="margin-bottom:20px"></div>
+      <button class="btn btn-w" onclick="wizardNext(2)">Siguiente</button>
+      <button class="btn btn-g" onclick="wizardBack(2)">Atrás</button>
+    </div>
+
+    <!-- Paso 3: duración -->
+    <div class="wizard-page" id="wp3">
+      <div class="m-title">Duración</div>
+      <div class="m-sub">¿Cuánto dura la competición?</div>
+      <div id="durBtns" style="margin-bottom:20px">
+        <button class="dur-btn on" id="dur-7" onclick="selDur(7)">1 semana <span>7 días</span></button>
+        <button class="dur-btn" id="dur-14" onclick="selDur(14)">2 semanas <span>14 días</span></button>
+        <button class="dur-btn" id="dur-30" onclick="selDur(30)">1 mes <span>30 días</span></button>
+        <button class="dur-btn" id="dur-0" onclick="selDur(0)">Sin límite <span>Hasta que decidáis</span></button>
+      </div>
+      <button class="btn btn-w" onclick="wizardNext(3)">Siguiente</button>
+      <button class="btn btn-g" onclick="wizardBack(3)">Atrás</button>
+    </div>
+
+    <!-- Paso 4: reglas -->
+    <div class="wizard-page" id="wp4">
+      <div class="m-title">Reglas</div>
+      <div class="m-sub">Al crear el grupo aceptas estas reglas para todos los participantes.</div>
+      <div style="margin-bottom:22px">
+        <div class="rule-item"><div class="rule-num">1</div><div class="rule-txt"><strong>Cero trampas.</strong> Tu progreso es tuyo. El grupo confía en ti.</div></div>
+        <div class="rule-item"><div class="rule-num">2</div><div class="rule-txt"><strong>Lo que empieces, lo terminas.</strong> No desaparezcas a mitad de competición.</div></div>
+        <div class="rule-item"><div class="rule-num">3</div><div class="rule-txt"><strong>Si fallas un día, mañana doble esfuerzo.</strong> Una caída no es el final.</div></div>
+        <div class="rule-item"><div class="rule-num">4</div><div class="rule-txt"><strong>El resultado importa. El proceso, más.</strong> Ganar está bien. Mejorar, mejor.</div></div>
+        <div class="rule-item"><div class="rule-num">5</div><div class="rule-txt"><strong>Si ves que un compañero flaquea, motívalo.</strong> Esto va de todos.</div></div>
+      </div>
+      <button class="btn btn-w" onclick="finishGroupSetup()">Acepto — Crear grupo</button>
+      <button class="btn btn-g" onclick="wizardBack(4)">Atrás</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REGLAS DEL GRUPO (al unirse) -->
+<div class="mbd" id="mGroupRules">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <div class="m-handle"></div>
+    <div class="m-title" id="grpRulesTitle">Reglas del grupo</div>
+    <div class="m-sub" id="grpRulesSub">Lee y acepta antes de unirte.</div>
+    <div style="margin-bottom:22px">
+      <div class="rule-item"><div class="rule-num">1</div><div class="rule-txt"><strong>Cero trampas.</strong> Tu progreso es tuyo. El grupo confía en ti.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div class="rule-txt"><strong>Lo que empieces, lo terminas.</strong> No desaparezcas a mitad de competición.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div class="rule-txt"><strong>Si fallas un día, mañana doble esfuerzo.</strong> Una caída no es el final.</div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div class="rule-txt"><strong>El resultado importa. El proceso, más.</strong> Ganar está bien. Mejorar, mejor.</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div class="rule-txt"><strong>Si ves que un compañero flaquea, motívalo.</strong> Esto va de todos.</div></div>
+    </div>
+    <div id="grpCompInfo" style="margin-bottom:18px;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;font-size:11px;color:var(--w3);font-family:'DM Mono',monospace;line-height:1.7"></div>
+    <button class="btn btn-w" onclick="confirmJoinGroup()">Acepto — Unirme</button>
+    <button class="btn btn-g" onclick="document.getElementById('mGroupRules').classList.remove('open')">Cancelar</button>
   </div>
 </div>
 
@@ -2296,18 +2421,92 @@ function showJoinBox(){
   document.getElementById('joinCodeIn')?.focus();
 }
 
-async function createGroup(){
-  const code=Math.random().toString(36).substr(2,6).toUpperCase();
-  const s=getS();s.groupCode=code;saveS(s);
-  await pushToLeaderboard(s);
-  showToast('Grupo creado: '+code);renderSocial();
+// ═══ WIZARD CREAR GRUPO ═══
+let _wizDur=7, _wizHabits=[];
+function createGroup(){
+  // Init wizard
+  _wizDur=7;_wizHabits=H.map(h=>h.id);
+  document.getElementById('compNameIn').value='';
+  // Render habit checkboxes
+  const list=document.getElementById('habitCheckList');
+  list.innerHTML=H.map(h=>`
+    <div class="habit-check-row" onclick="toggleHabitCheck('${h.id}')">
+      <div class="habit-check-icon" style="background:${h.color||'#555'}">${ICONS[h.icon||h.id]||''}</div>
+      <div class="habit-check-name">${h.name}</div>
+      <div class="habit-check-pts">${h.pts}pts</div>
+      <div class="hcheck-box on" id="hchk-${h.id}"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+    </div>`).join('');
+  // Duration buttons
+  selDur(7);
+  // Show step 1
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('wp'+i).className='wizard-page'+(i===1?' on':'');
+    document.getElementById('ws'+i).className='wstep'+(i===1?' on':'');
+  });
+  document.getElementById('mGroupSetup').classList.add('open');
 }
 
+function toggleHabitCheck(id){
+  const box=document.getElementById('hchk-'+id);if(!box)return;
+  if(_wizHabits.includes(id)){_wizHabits=_wizHabits.filter(x=>x!==id);box.classList.remove('on');}
+  else{_wizHabits.push(id);box.classList.add('on');}
+}
+function selDur(d){
+  _wizDur=d;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('dur-'+d)?.classList.add('on');
+}
+function wizardNext(step){
+  if(step===1&&!document.getElementById('compNameIn').value.trim()){showToast('Escribe un nombre');return;}
+  if(step===2&&_wizHabits.length===0){showToast('Selecciona al menos un hábito');return;}
+  const next=step+1;
+  document.getElementById('wp'+step).className='wizard-page';
+  document.getElementById('wp'+next).className='wizard-page on';
+  document.getElementById('ws'+next).className='wstep on';
+}
+function wizardBack(step){
+  const prev=step-1;
+  document.getElementById('wp'+step).className='wizard-page';
+  document.getElementById('wp'+prev).className='wizard-page on';
+}
+async function finishGroupSetup(){
+  const code=Math.random().toString(36).substr(2,6).toUpperCase();
+  const name=document.getElementById('compNameIn').value.trim()||'Competición';
+  const cfg={code,name,habits:_wizHabits,duration:_wizDur,createdAt:Date.now()};
+  localStorage.setItem('grp_cfg_'+code,JSON.stringify(cfg));
+  const s=getS();s.groupCode=code;saveS(s);
+  await pushToLeaderboard(s);
+  document.getElementById('mGroupSetup').classList.remove('open');
+  showToast('Grupo "'+name+'" creado: '+code);
+  renderSocial();
+}
+
+// Al unirse: mostrar reglas primero
+let _pendingJoinCode='';
 async function joinGroup(){
   const code=(document.getElementById('joinCodeIn')?.value||'').trim().toUpperCase();
   if(code.length<4){showToast('Código inválido');return;}
+  _pendingJoinCode=code;
+  // Intentar cargar config del grupo
+  const sc=getSupa();
+  let cfg=null;
+  try{
+    const{data}=await sc.from('leaderboard').select('group_name,group_habits,group_duration').eq('group_code',code).limit(1).single();
+    if(data)cfg=data;
+  }catch(e){}
+  const infoEl=document.getElementById('grpCompInfo');
+  if(cfg?.group_name){
+    infoEl.innerHTML=`Competición: <strong style="color:var(--w)">${cfg.group_name}</strong><br>Duración: ${cfg.group_duration?cfg.group_duration+'d':'Sin límite'}`;
+  } else {
+    infoEl.innerHTML='Código: <strong style="color:var(--w)">'+code+'</strong>';
+  }
+  document.getElementById('mGroupRules').classList.add('open');
+}
+async function confirmJoinGroup(){
+  const code=_pendingJoinCode;if(!code)return;
   const s=getS();s.groupCode=code;saveS(s);
   await pushToLeaderboard(s);
+  document.getElementById('mGroupRules').classList.remove('open');
   showToast('¡Bienvenido al grupo '+code+'!');renderSocial();
 }
 
@@ -2390,25 +2589,57 @@ async function fetchGroupData(groupCode){
       chalEl.innerHTML=chalHtml;
     }
 
-    // — Ranking —
-    if(rkLbl)rkLbl.style.display='block';
-    const maxPts=Math.max(...data.map(r=>r.points||0),1);
-    rkEl.innerHTML=data.map((r,i)=>{
-      const pos=i+1;const posClass=pos<=3?'top'+pos:'';
-      const name=r.display_name||'Usuario';const pts=r.points||0;
-      const pct=Math.round((pts/maxPts)*100);
-      const habitsToday=(r.habits_today||[]).length;
-      return`<div class="lb-row">
-        <div class="lb-pos ${posClass}">${pos}</div>
-        <div class="lb-avatar">${_initials(name)}</div>
-        <div class="lb-info">
-          <div class="lb-name">${name}</div>
-          <div class="lb-bar-w"><div class="lb-bar" style="width:${pct}%"></div></div>
-          <div class="lb-sub">${habitsToday}/${H.length} hoy · Racha ${r.streak||0}d</div>
-        </div>
-        <div class="lb-pts">${pts}</div>
-      </div>`;
-    }).join('');
+    // — Carrera visual —
+    const raceEl=document.getElementById('socRace');
+    const raceLbl=document.getElementById('socRaceLbl');
+    if(raceEl&&raceLbl){
+      raceLbl.style.display='block';raceEl.style.display='block';
+      const maxPts=Math.max(...data.map(r=>r.points||0),1);
+      const myS=getS();const myName=myS.displayName||(myS.token||'');
+      const posClass=(pos)=>pos===1?'p1':pos===2?'p2':pos===3?'p3':'pN';
+      const posLabel=(pos)=>pos===1?'1':pos===2?'2':pos===3?'3':pos;
+      const accentColor=(pos)=>pos===1?'#f0c040':pos===2?'#b0b8c4':pos===3?'#c87840':'rgba(255,255,255,.3)';
+      // SVG corredor personalizado
+      function runnerSVG(color,size=22){
+        return`<svg width="${size}" height="${size+6}" viewBox="0 0 22 28" fill="none">
+          <circle cx="11" cy="5" r="3.5" fill="${color}"/>
+          <line x1="11" y1="8.5" x2="11" y2="17" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="11" y1="13" x2="6" y2="11" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+          <line x1="11" y1="13" x2="16" y2="10" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+          <line x1="11" y1="17" x2="7" y2="24" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="11" y1="17" x2="15" y2="24" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>`;
+      }
+      raceEl.innerHTML=data.map((r,i)=>{
+        const pos=i+1;
+        const name=r.display_name||'Usuario';
+        const pts=r.points||0;
+        const pct=Math.max(2,Math.round((pts/maxPts)*100));
+        const habitsToday=(r.habits_today||[]).length;
+        const streak=r.streak||0;
+        const color=accentColor(pos);
+        const isLeader=pos===1;
+        const isMe=name===myName;
+        return`<div class="race-row">
+          <div class="race-medal ${posClass(pos)}">${posLabel(pos)}</div>
+          <div class="race-center">
+            <div class="race-name-row">
+              <div class="race-name">${name}${isMe?' (tú)':''}</div>
+              <div class="race-pts">${pts}</div>
+            </div>
+            <div class="race-track">
+              <div class="race-track-bg"></div>
+              <div class="race-track-fill" style="width:${pct}%;background:${color};box-shadow:0 0 8px ${color}"></div>
+              <div class="race-runner${isLeader?' leader':''}" style="left:${Math.min(pct,96)}%">
+                ${runnerSVG(color)}
+                <div class="race-runner-label">${habitsToday}/${H.length}hoy</div>
+              </div>
+            </div>
+            <div class="race-sub">Racha ${streak}d${habitsToday===H.length?' · Día completo ✓':''}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
 
     // — Feed —
     const feed=data.flatMap(r=>(r.habits_today||[]).map(h=>({name:r.display_name||'Usuario',habit:h.name,ts:h.ts||0})))
