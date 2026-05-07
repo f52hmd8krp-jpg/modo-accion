@@ -424,26 +424,41 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .lvl-particle{position:absolute;border-radius:50%;animation:particleFly 1.4s ease-out forwards}
 @keyframes particleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
-/* ═══ CARRERA VISUAL ═══ */
-.race-wrap{padding:0 22px 20px}
-.race-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.race-medal{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;flex-shrink:0;letter-spacing:0}
-.race-medal.p1{background:rgba(240,192,64,.12);color:#f0c040;border:1px solid rgba(240,192,64,.3)}
-.race-medal.p2{background:rgba(176,184,196,.08);color:#b0b8c4;border:1px solid rgba(176,184,196,.2)}
-.race-medal.p3{background:rgba(200,120,64,.08);color:#c87840;border:1px solid rgba(200,120,64,.2)}
-.race-medal.pN{background:var(--s2);color:var(--w3);border:1px solid var(--b1)}
-.race-center{flex:1;min-width:0}
-.race-name-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.race-name{font-size:12px;color:var(--w2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
-.race-pts{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--w);letter-spacing:1px}
-.race-track{position:relative;height:28px}
-.race-track-bg{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--b1);border-radius:1px}
-.race-track-fill{position:absolute;bottom:0;left:0;height:2px;border-radius:1px;transition:width 1.2s cubic-bezier(.34,1.1,.64,1);min-width:2px}
-.race-runner{position:absolute;bottom:2px;transform:translateX(-50%);transition:left 1.2s cubic-bezier(.34,1.1,.64,1);display:flex;flex-direction:column;align-items:center;gap:1px}
-.race-runner-label{font-size:7px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.3px;white-space:nowrap}
-.race-sub{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.3px}
-@keyframes runnerBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-2px)}}
-.race-runner.leader{animation:runnerBounce 1s ease-in-out infinite}
+/* ═══ ARENA ═══ */
+.arena-wrap{padding:0 22px 20px}
+.arena-card{position:relative;border-radius:16px;padding:16px 16px 14px;margin-bottom:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--b1)}
+.arena-card.pos1{border-color:rgba(240,192,64,.35);background:linear-gradient(140deg,rgba(240,192,64,.07) 0%,var(--s1) 55%)}
+.arena-card.pos2{border-color:rgba(200,210,220,.2);background:linear-gradient(140deg,rgba(200,210,220,.04) 0%,var(--s1) 55%)}
+.arena-card.pos3{border-color:rgba(200,120,64,.25);background:linear-gradient(140deg,rgba(200,120,64,.05) 0%,var(--s1) 55%)}
+.arena-card.posN{background:var(--s1)}
+/* Watermark número posición */
+.arena-wm{position:absolute;right:-8px;top:-16px;font-family:'Bebas Neue',sans-serif;font-size:130px;line-height:1;color:rgba(255,255,255,.03);pointer-events:none;user-select:none;letter-spacing:-4px}
+.arena-card.pos1 .arena-wm{color:rgba(240,192,64,.06)}
+.arena-card.pos2 .arena-wm{color:rgba(200,210,220,.04)}
+.arena-card.pos3 .arena-wm{color:rgba(200,120,64,.05)}
+/* Layout interno */
+.arena-inner{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.arena-fig{width:72px;height:86px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center}
+.arena-right{flex:1;min-width:0}
+.arena-rank-label{font-size:8px;letter-spacing:2.5px;font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:1px}
+.arena-rank-label.gold{color:rgba(240,192,64,.7)}
+.arena-rank-label.silver{color:rgba(200,210,220,.5)}
+.arena-rank-label.bronze{color:rgba(200,120,64,.6)}
+.arena-rank-label.other{color:var(--w3)}
+.arena-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--w);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.arena-pts-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+.arena-pts{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;letter-spacing:1px;color:var(--w)}
+.arena-pts-lbl{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.5px}
+.arena-meta{font-size:9px;color:var(--w3);font-family:'DM Mono',monospace;letter-spacing:.4px}
+.arena-bar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;margin-top:10px;position:relative;z-index:1}
+.arena-bar-fill{height:2px;border-radius:1px;transition:width 1.6s cubic-bezier(.34,1.1,.64,1)}
+/* Figura animaciones */
+@keyframes figFloat{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-7px) rotate(-2deg)}70%{transform:translateY(-4px) rotate(1deg)}}
+@keyframes figRun{0%,100%{transform:rotate(-2deg) translateX(0)}50%{transform:rotate(2deg) translateX(2px)}}
+@keyframes figBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.fig-celebrate{animation:figFloat 1.8s ease-in-out infinite;transform-origin:bottom center}
+.fig-run{animation:figRun .7s ease-in-out infinite;transform-origin:bottom center}
+.fig-rest{animation:figBreath 3s ease-in-out infinite;transform-origin:bottom center}
 
 /* ═══ WIZARD GRUPO ═══ */
 .wizard-steps{display:flex;gap:6px;margin-bottom:22px;justify-content:center}
@@ -804,8 +819,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div class="slbl">Grupo</div>
   <div id="socGroup" style="padding:0 22px 8px"></div>
   <div id="socStreak"></div>
-  <div class="slbl" id="socRaceLbl" style="display:none">Carrera</div>
-  <div id="socRace" class="race-wrap" style="display:none"></div>
+  <div class="slbl" id="socRaceLbl" style="display:none">Arena</div>
+  <div id="socRace" class="arena-wrap" style="display:none"></div>
   <div class="slbl" id="socChallengeLbl" style="display:none">Reto de la semana</div>
   <div id="socChallenge" style="padding:0 22px 4px"></div>
   <div class="slbl" id="socFeedLbl" style="display:none">Actividad reciente</div>
@@ -2589,53 +2604,70 @@ async function fetchGroupData(groupCode){
       chalEl.innerHTML=chalHtml;
     }
 
-    // — Carrera visual —
+    // — Arena —
     const raceEl=document.getElementById('socRace');
     const raceLbl=document.getElementById('socRaceLbl');
     if(raceEl&&raceLbl){
       raceLbl.style.display='block';raceEl.style.display='block';
       const maxPts=Math.max(...data.map(r=>r.points||0),1);
       const myS=getS();const myName=myS.displayName||(myS.token||'');
-      const posClass=(pos)=>pos===1?'p1':pos===2?'p2':pos===3?'p3':'pN';
-      const posLabel=(pos)=>pos===1?'1':pos===2?'2':pos===3?'3':pos;
-      const accentColor=(pos)=>pos===1?'#f0c040':pos===2?'#b0b8c4':pos===3?'#c87840':'rgba(255,255,255,.3)';
-      // SVG corredor personalizado
-      function runnerSVG(color,size=22){
-        return`<svg width="${size}" height="${size+6}" viewBox="0 0 22 28" fill="none">
-          <circle cx="11" cy="5" r="3.5" fill="${color}"/>
-          <line x1="11" y1="8.5" x2="11" y2="17" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <line x1="11" y1="13" x2="6" y2="11" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
-          <line x1="11" y1="13" x2="16" y2="10" stroke="${color}" stroke-width="2" stroke-linecap="round"/>
-          <line x1="11" y1="17" x2="7" y2="24" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
-          <line x1="11" y1="17" x2="15" y2="24" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+      const posClass=(p)=>p===1?'pos1':p===2?'pos2':p===3?'pos3':'posN';
+      const rankLbl=(p)=>p===1?{cls:'gold',txt:'1° LUGAR'}:p===2?{cls:'silver',txt:'2° LUGAR'}:p===3?{cls:'bronze',txt:'3° LUGAR'}:{cls:'other',txt:'#'+p+' PUESTO'};
+      const figColor=(p)=>p===1?'#f0c040':p===2?'#c8d4e0':p===3?'#e09040':'rgba(255,255,255,.45)';
+      function figSVG(pose,color){
+        if(pose==='celebrate')return`<svg viewBox="0 0 60 80" width="56" height="76" fill="${color}">
+          <circle cx="30" cy="8" r="7"/>
+          <polygon points="20,16 40,16 38,42 22,42"/>
+          <polygon points="20,20 8,6 5,10 17,26"/>
+          <polygon points="40,20 52,6 55,10 43,26"/>
+          <polygon points="22,42 20,70 26,70 28,44"/>
+          <polygon points="38,42 40,70 34,70 32,44"/>
+        </svg>`;
+        if(pose==='run')return`<svg viewBox="0 0 60 80" width="56" height="76" fill="${color}">
+          <circle cx="34" cy="8" r="7"/>
+          <polygon points="24,16 44,18 40,42 22,38"/>
+          <polygon points="24,22 8,30 10,36 26,28"/>
+          <polygon points="40,22 54,14 56,20 42,28"/>
+          <polygon points="22,40 14,62 20,64 28,44"/>
+          <polygon points="36,42 44,68 38,70 32,44"/>
+        </svg>`;
+        return`<svg viewBox="0 0 60 80" width="56" height="76" fill="${color}">
+          <circle cx="30" cy="8" r="7"/>
+          <polygon points="22,16 38,16 36,42 24,42"/>
+          <polygon points="22,18 14,42 20,44 26,22"/>
+          <polygon points="38,18 46,42 40,44 34,22"/>
+          <polygon points="24,42 20,72 26,72 28,44"/>
+          <polygon points="36,42 40,72 34,72 32,44"/>
         </svg>`;
       }
       raceEl.innerHTML=data.map((r,i)=>{
         const pos=i+1;
         const name=r.display_name||'Usuario';
         const pts=r.points||0;
-        const pct=Math.max(2,Math.round((pts/maxPts)*100));
         const habitsToday=(r.habits_today||[]).length;
         const streak=r.streak||0;
-        const color=accentColor(pos);
-        const isLeader=pos===1;
         const isMe=name===myName;
-        return`<div class="race-row">
-          <div class="race-medal ${posClass(pos)}">${posLabel(pos)}</div>
-          <div class="race-center">
-            <div class="race-name-row">
-              <div class="race-name">${name}${isMe?' (tú)':''}</div>
-              <div class="race-pts">${pts}</div>
+        const pose=habitsToday>=H.length?'celebrate':habitsToday>0?'run':'rest';
+        const color=figColor(pos);
+        const pc=posClass(pos);
+        const rl=rankLbl(pos);
+        const pct=Math.round((pts/maxPts)*100);
+        return`<div class="arena-card ${pc}">
+          <div class="arena-wm">${pos}</div>
+          <div class="arena-inner">
+            <div class="arena-fig">
+              <div class="fig-${pose}">${figSVG(pose,color)}</div>
             </div>
-            <div class="race-track">
-              <div class="race-track-bg"></div>
-              <div class="race-track-fill" style="width:${pct}%;background:${color};box-shadow:0 0 8px ${color}"></div>
-              <div class="race-runner${isLeader?' leader':''}" style="left:${Math.min(pct,96)}%">
-                ${runnerSVG(color)}
-                <div class="race-runner-label">${habitsToday}/${H.length}hoy</div>
+            <div class="arena-right">
+              <div class="arena-rank-label ${rl.cls}">${rl.txt}</div>
+              <div class="arena-name">${name}${isMe?' · TÚ':''}</div>
+              <div class="arena-pts-row">
+                <div class="arena-pts">${pts}</div>
+                <div class="arena-pts-lbl">PTS TOTALES</div>
               </div>
+              <div class="arena-meta">${habitsToday}/${H.length} hábitos hoy · racha ${streak}d</div>
+              <div class="arena-bar"><div class="arena-bar-fill" style="width:${pct}%;background:${color};box-shadow:0 0 6px ${color}40"></div></div>
             </div>
-            <div class="race-sub">Racha ${streak}d${habitsToday===H.length?' · Día completo ✓':''}</div>
           </div>
         </div>`;
       }).join('');
