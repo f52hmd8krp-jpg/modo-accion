@@ -1,4 +1,4 @@
-const CACHE = 'modo-accion-v23';
+const CACHE = 'modo-accion-v24';
 const ASSETS = [
   '/modo-accion/',
   '/modo-accion/index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
   '/modo-accion/apple-touch-icon-v2.png',
   '/modo-accion/jsqr.min.js',
   '/modo-accion/qrcode.min.js',
-  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap'
+  'https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@300;400;500;700&display=swap'
 ];
 
 self.addEventListener('install', e => {
