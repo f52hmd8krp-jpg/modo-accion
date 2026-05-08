@@ -2063,6 +2063,11 @@ function closeText(){document.getElementById('mText').classList.remove('open');}
 
 function finishHabit(id,data={}){
   const s=getS();const h=H.find(x=>x.id===id);if(!h||s.done[id])return;
+  // Hábito dormir: solo válido entre las 23:00 y las 23:15
+  if(h.name.toLowerCase().includes('dormir')){
+    const now=new Date(),mins=now.getHours()*60+now.getMinutes();
+    if(mins<23*60||mins>=23*60+15){showToast('Dormir solo puntúa entre las 23:00 y las 23:15');return;}
+  }
   let pts=h.pts,bonus=0;const str=s.streaks[id]||0;
   if(h.bCond==='streak5'&&str>=4)bonus=h.bPts;
   if(h.bCond==='streak7'&&str>=6)bonus=h.bPts;
@@ -2323,6 +2328,11 @@ function schedNotif(){
   if(refDelay>0)setTimeout(()=>{
     const s2=getS();if(!s2.reflections[td()])new Notification('Modo Acción',{body:'¿Cómo ha ido el día? Escribe tu reflexión.',tag:'ma-reflex'});
   },refDelay);
+  // Notificación hábito dormir a las 23:00
+  const sleepH=H.find(h=>h.name.toLowerCase().includes('dormir'));
+  if(sleepH){const sleepTarget=new Date(now);sleepTarget.setHours(23,0,0,0);const sleepDelay=sleepTarget-now;
+    if(sleepDelay>0)setTimeout(()=>{const s2=getS();if(!s2.done[sleepH.id])new Notification('Modo Acción — Dormir',{body:'Tienes 15 minutos para escanear tu hábito de dormir.',tag:'ma-sleep',requireInteraction:true});},sleepDelay);
+  }
 }
 
 function renderReflex(){
