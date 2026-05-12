@@ -217,10 +217,156 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .cd.full{background:var(--w);color:var(--bg);font-weight:700}
 .cd.partial{background:var(--w3);color:var(--bg)}
 .cd.missed{background:transparent;color:var(--b2)}
+/* STATS v2 — Arquitectura de contenido por bloques */
+.block-status{margin:0 22px 14px;padding:18px;border:1px solid var(--b1);border-radius:16px;background:var(--s1);display:flex;align-items:center;gap:16px}
+.bs-prax{flex-shrink:0;width:84px;height:100px;display:flex;align-items:center;justify-content:center}
+.bs-prax .prax-img-wrap{width:84px;height:100px}
+.bs-info{flex:1;min-width:0}
+.bs-nivel{font-family:'Anton',sans-serif;font-size:36px;letter-spacing:.04em;color:var(--w);line-height:1;margin-bottom:6px;display:flex;align-items:baseline;gap:10px}
+.bs-trend{font-size:22px;color:var(--w2);font-weight:400;font-family:'JetBrains Mono',monospace}
+.bs-trend.up{color:var(--lvl-accent)}
+.bs-trend.down{color:#ff7a7a}
+.bs-msg{font-size:12px;color:var(--w2);font-family:'JetBrains Mono',monospace;line-height:1.4;margin-bottom:8px;letter-spacing:0}
+.bs-ratio{font-size:9px;color:var(--w3);letter-spacing:.16em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+
+.block-action{margin:0 22px 22px;padding:16px 18px;border:1px solid var(--b2);border-radius:14px;background:color-mix(in oklab,var(--lvl-accent) 6%,var(--s1));cursor:pointer;transition:border-color .15s,background .15s;text-align:left;width:calc(100% - 44px);font-family:inherit;color:inherit}
+.block-action:hover{border-color:var(--lvl-accent)}
+.block-action.closed{background:var(--s1);border-color:var(--b1);cursor:default;opacity:.65}
+.block-action.closed:hover{border-color:var(--b1)}
+.ba-label{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--w3);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
+.ba-habit{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.02em;color:var(--w);margin-bottom:6px;line-height:1.05}
+.ba-reason{font-size:11px;color:var(--w2);font-family:'JetBrains Mono',monospace;line-height:1.4;letter-spacing:0}
+
+.habit-list-v2{margin:0 22px 24px;border-top:1px solid var(--b1)}
+.hl2-row{display:flex;align-items:center;padding:13px 2px;border-bottom:1px solid var(--b1);gap:12px}
+.hl2-icon{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--w3);flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;transition:all .2s}
+.hl2-row.done .hl2-icon{background:var(--lvl-accent);border-color:var(--lvl-accent)}
+.hl2-row.done .hl2-icon::after{content:'';width:7px;height:3.5px;border-left:1.5px solid #0a0a0a;border-bottom:1.5px solid #0a0a0a;transform:rotate(-45deg) translate(0,-1px)}
+.hl2-row.failed .hl2-icon{border-color:#ff7a7a}
+.hl2-row.failed .hl2-icon::after{content:'×';color:#ff7a7a;font-size:15px;line-height:1;font-family:'JetBrains Mono',monospace}
+.hl2-name{flex:1;font-size:14px;color:var(--w2);font-family:'JetBrains Mono',monospace;letter-spacing:0}
+.hl2-row.done .hl2-name{color:var(--w3)}
+.hl2-row.failed .hl2-name{color:var(--w3);text-decoration:line-through;text-decoration-color:var(--w4)}
+.hl2-state{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--w3);font-family:'JetBrains Mono',monospace}
+
+.block-streak{margin:0 22px 24px;padding:16px 18px;border:1px solid var(--b1);border-radius:14px;background:var(--s1)}
+.bd-num{font-family:'Anton',sans-serif;font-size:34px;line-height:1;color:var(--w);letter-spacing:.02em;display:flex;align-items:baseline;gap:8px}
+.bd-num small{font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.bd-best{font-size:11px;color:var(--w3);font-family:'JetBrains Mono',monospace;margin-top:5px;letter-spacing:0}
+.bd-risk{margin-top:11px;padding-top:11px;border-top:1px solid var(--b1);font-size:11px;color:#ffb86b;font-family:'JetBrains Mono',monospace;letter-spacing:0;line-height:1.4}
+
+.block-progress{margin:0 22px 24px;padding:16px 18px;border:1px solid var(--b1);border-radius:14px;background:var(--s1)}
+.bp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.bp-metric{font-family:'Anton',sans-serif;font-size:26px;color:var(--w);letter-spacing:.02em;display:flex;align-items:baseline;gap:6px}
+.bp-metric small{font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.bp-delta{font-size:10px;color:var(--w2);font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
+.bp-delta.up{color:var(--lvl-accent)}
+.bp-delta.down{color:#ff7a7a}
+.bp-marks{display:flex;gap:5px;margin-bottom:6px}
+.bp-mark{flex:1;height:22px;border-radius:5px;background:var(--b1);transition:background .2s}
+.bp-mark.full{background:var(--lvl-accent)}
+.bp-mark.partial{background:color-mix(in oklab,var(--lvl-accent) 45%,var(--b1))}
+.bp-mark.fail{background:var(--b1)}
+.bp-mark.today{outline:1.5px solid var(--w2);outline-offset:1px}
+.bp-days{display:flex;gap:5px}
+.bp-day{flex:1;text-align:center;font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase}
+
+/* STATS v3 — Evolución / Análisis */
+.block-trend{margin:0 22px 24px;padding:18px;border:1px solid var(--b1);border-radius:14px;background:var(--s1)}
+.bt-head{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+.bt-prax{flex-shrink:0;width:64px;height:76px;display:flex;align-items:center;justify-content:center}
+.bt-prax .prax-img-wrap{width:64px;height:76px}
+.bt-main{flex:1;min-width:0}
+.bt-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.bt-pct{font-family:'Anton',sans-serif;font-size:44px;color:var(--w);letter-spacing:.02em;line-height:1;display:flex;align-items:baseline;gap:8px}
+.bt-arrow{font-size:24px;color:var(--w2);font-family:'JetBrains Mono',monospace}
+.bt-arrow.up{color:var(--lvl-accent)}
+.bt-arrow.down{color:#ff7a7a}
+.bt-delta{font-size:11px;color:var(--w2);font-family:'JetBrains Mono',monospace;letter-spacing:0;text-align:right}
+.bt-delta.up{color:var(--lvl-accent)}
+.bt-delta.down{color:#ff7a7a}
+.bt-msg{font-size:11px;color:var(--w2);font-family:'JetBrains Mono',monospace;line-height:1.4;letter-spacing:0;margin-bottom:16px}
+.bt-bars{display:flex;align-items:flex-end;height:60px;gap:10px}
+.bt-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;justify-content:flex-end;height:100%}
+.bt-bar{width:100%;background:var(--lvl-accent);border-radius:4px 4px 0 0;opacity:.4;min-height:3px;transition:height .5s var(--ease-out)}
+.bt-bar-wrap:last-child .bt-bar{opacity:1}
+.bt-bar-lbl{font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
+
+.block-weak,.block-strong{margin:0 22px 22px;padding:16px 18px;border:1px solid var(--b1);border-radius:14px;background:var(--s1)}
+.bx-name{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.02em;color:var(--w);line-height:1.05;margin-bottom:8px}
+.bx-stat{font-size:13px;color:var(--w2);font-family:'JetBrains Mono',monospace;letter-spacing:0;margin-bottom:4px}
+.bx-sub{font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:0;margin-top:2px}
+.bx-empty{font-size:11px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:0;padding:6px 0}
+
+.block-patterns,.block-records{margin:0 22px 24px;padding:4px 18px;border:1px solid var(--b1);border-radius:14px;background:var(--s1)}
+.bp2-row,.br-row{display:flex;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--b1);gap:14px;flex-wrap:wrap}
+.bp2-row:last-child,.br-row:last-child{border-bottom:none}
+.bp2-lbl,.br-lbl{font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;width:100px;flex-shrink:0}
+.bp2-val{flex:1;font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.02em;color:var(--w)}
+.bp2-pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--w2);letter-spacing:.05em}
+.br-val{flex:1;font-family:'Anton',sans-serif;font-size:24px;color:var(--w);letter-spacing:.02em;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.br-val small{font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.br-sub{flex-basis:100%;font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:0;margin-top:2px}
+.br-highlight{margin:14px 0 4px;padding:11px 12px;background:color-mix(in oklab,var(--lvl-accent) 8%,var(--s2));border-left:2px solid var(--lvl-accent);border-radius:0 8px 8px 0;font-size:11px;color:var(--w);font-family:'JetBrains Mono',monospace;line-height:1.4;letter-spacing:0}
+.bx-context{font-size:11px;color:var(--w2);font-family:'JetBrains Mono',monospace;line-height:1.4;letter-spacing:0;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)}
+.block-empty{margin:0 22px 22px;padding:18px 18px;border:1px dashed var(--b1);border-radius:14px;background:transparent;text-align:left}
+.be-msg{font-size:12px;color:var(--w2);font-family:'JetBrains Mono',monospace;line-height:1.45;letter-spacing:0}
+.be-days{font-size:9px;color:var(--w3);letter-spacing:.16em;text-transform:uppercase;margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+.hist-link{margin:4px 22px 24px;padding:13px;background:transparent;border:1px dashed var(--b2);border-radius:12px;color:var(--w2);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;width:calc(100% - 44px);transition:border-color .15s,color .15s}
+.hist-link:hover{border-color:var(--b3);color:var(--w)}
+.hist-body{padding-bottom:8px}
+
 .overall-grid{padding:0 22px 28px;display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .big-card{border:1px solid var(--b1);border-radius:12px;padding:15px;background:var(--s1)}
 .big-val{font-family:'Anton',sans-serif;font-size:34px;letter-spacing:0.01em;color:var(--w);line-height:1}
 .big-lbl{font-size:9px;color:var(--w3);margin-top:5px;font-family:'JetBrains Mono',monospace;letter-spacing:.8px;text-transform:uppercase}
+
+/* PRAX */
+.prax-section{padding:0 22px 6px}
+.prax-global-card{display:flex;align-items:center;gap:16px;border:1px solid var(--b1);border-radius:16px;padding:18px 16px;background:var(--s1);margin-bottom:12px;position:relative;overflow:hidden}
+.prax-global-card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--prax-glow,transparent) 0%,transparent 70%);pointer-events:none}
+.prax-mascot-wrap{flex-shrink:0}
+.prax-svg-el{display:block;transition:filter .4s ease}
+.prax-state-high .prax-svg-el{filter:drop-shadow(0 0 14px var(--lvl-accent))}
+.prax-state-medium .prax-svg-el{filter:drop-shadow(0 0 8px rgba(240,192,64,.38))}
+.prax-state-low .prax-svg-el{filter:drop-shadow(0 0 3px rgba(255,255,255,.08))}
+.prax-state-broken .prax-svg-el{filter:grayscale(1) brightness(.38)}
+.prax-global-info{flex:1;min-width:0}
+.prax-global-name{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:0.04em;color:var(--w);line-height:1;margin-bottom:4px}
+.prax-global-msg{font-size:11px;color:var(--w2);font-family:'JetBrains Mono',monospace;margin-bottom:10px;line-height:1.4;letter-spacing:0}
+.prax-ebar{height:3px;border-radius:2px;background:var(--s3);overflow:hidden;margin-bottom:5px}
+.prax-efill{height:100%;border-radius:2px;background:var(--lvl-accent);transition:width .7s var(--ease-out)}
+.prax-elabels{display:flex;justify-content:space-between;font-size:8px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase}
+.prax-habit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.prax-hcard{border:1px solid var(--b1);border-radius:12px;padding:10px 6px 8px;text-align:center;background:var(--s1);position:relative;overflow:hidden;transition:border-color .2s}
+.prax-hcard.prax-state-high{border-color:color-mix(in oklab,var(--lvl-accent) 30%,transparent);background:color-mix(in oklab,var(--lvl-accent) 5%,var(--s1))}
+.prax-hcard.prax-state-broken{opacity:.5}
+.prax-hname{font-size:8px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:.3px;margin-bottom:3px;text-transform:uppercase}
+.prax-hmsg{font-size:9px;color:var(--w2);font-family:'JetBrains Mono',monospace;line-height:1.3;letter-spacing:0;min-height:20px}
+.prax-hstreak{position:absolute;top:5px;right:6px;font-family:'Anton',sans-serif;font-size:12px;color:var(--lvl-accent);line-height:1}
+.prax-hbar{height:2px;border-radius:1px;background:var(--s3);margin-top:6px;overflow:hidden}
+.prax-hbarfill{height:100%;border-radius:1px;background:var(--lvl-accent);transition:width .6s var(--ease-out)}
+@keyframes prax-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes prax-broken{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+.prax-state-high .prax-mascot-wrap{animation:prax-pulse 2.4s ease-in-out infinite}
+.prax-state-broken .prax-mascot-wrap{animation:prax-broken 3s ease-in-out infinite}
+
+/* PRAX IMG (PNG con halo de color por estado) */
+.prax-img-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.prax-img-halo{position:absolute;inset:18% 0;border-radius:50%;filter:blur(22px);opacity:0;pointer-events:none;z-index:0;transition:opacity .4s ease,background .4s ease}
+.prax-img{width:100%;height:100%;object-fit:contain;position:relative;z-index:1;display:block}
+.prax-img-fallback{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center}
+.prax-halo-activo{background:#31D17A;opacity:.55}
+.prax-halo-enfocado{background:#4CA3FF;opacity:.45}
+.prax-halo-bajo{background:#FFD24C;opacity:.35}
+.prax-halo-roto{background:#FF4D4D;opacity:.30}
+.prax-halo-recuperando{background:#fff;opacity:.18}
+.prax-halo-neutro{display:none}
+@keyframes prax-img-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes prax-img-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-1.5px)}75%{transform:translateX(1.5px)}}
+.prax-state-high .prax-img,.prax-state-medium .prax-img{animation:prax-img-pulse 2.4s ease-in-out infinite;transform-origin:center 75%}
+.prax-state-broken .prax-img{animation:prax-img-shake 1.6s ease-in-out infinite;opacity:.85}
 
 /* SETTINGS */
 .set-hdr{padding:36px 22px 16px}
@@ -822,41 +968,61 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="stats-title">Datos</div>
     <div class="stats-date" id="statsDate"></div>
   </div>
-  <div class="slbl">Racha individual</div>
-  <div class="streak-grid" id="strGrid"></div>
-  <div class="slbl">Progreso por hábito</div>
-  <div class="chart-sec">
-    <div class="chart-tabs">
-      <button class="ctab active" id="ctab-days" onclick="switchChartTab('days')">Semana</button>
-      <button class="ctab" id="ctab-weeks" onclick="switchChartTab('weeks')">Mes</button>
+  <!-- A. Tendencia general -->
+  <div class="slbl">Tendencia</div>
+  <div class="block-trend" id="blockTrend"></div>
+
+  <!-- B. A mejorar -->
+  <div class="slbl">A mejorar</div>
+  <div class="block-weak" id="blockWeak"></div>
+
+  <!-- C. Funcionando -->
+  <div class="slbl">Funcionando</div>
+  <div class="block-strong" id="blockStrong"></div>
+
+  <!-- D. Récords -->
+  <div class="slbl">Récords</div>
+  <div class="block-records" id="blockRecords"></div>
+
+  <!-- E. Patrones -->
+  <div class="slbl">Patrones</div>
+  <div class="block-patterns" id="blockPatterns"></div>
+
+  <!-- Histórico (plegable) -->
+  <button class="hist-link" id="histLink" onclick="toggleHist()">Ver histórico ›</button>
+  <div class="hist-body" id="histBody" style="display:none">
+    <div class="slbl">Progreso por hábito</div>
+    <div class="chart-sec">
+      <div class="chart-tabs">
+        <button class="ctab active" id="ctab-days" onclick="switchChartTab('days')">Semana</button>
+        <button class="ctab" id="ctab-weeks" onclick="switchChartTab('weeks')">Mes</button>
+      </div>
+      <div class="line-chart-wrap"><svg id="lineChart" width="100%" height="140" style="overflow:visible"></svg></div>
+      <div class="chart-legend" id="chartLegend"></div>
     </div>
-    <div class="line-chart-wrap"><svg id="lineChart" width="100%" height="140" style="overflow:visible"></svg></div>
-    <div class="chart-legend" id="chartLegend"></div>
-  </div>
-  <div class="slbl">Semana</div>
-  <div class="chart-sec"><div class="week-chart" id="wChart"></div></div>
-  <div class="slbl">Historial</div>
-  <div class="cal-sec">
-    <div class="cal-hrow">
-      <button class="cal-nav" onclick="chMonth(-1)">‹</button>
-      <div class="cal-month" id="calTitle"></div>
-      <button class="cal-nav" id="calNext" onclick="chMonth(1)">›</button>
+    <div class="slbl">Calendario</div>
+    <div class="cal-sec">
+      <div class="cal-hrow">
+        <button class="cal-nav" onclick="chMonth(-1)">‹</button>
+        <div class="cal-month" id="calTitle"></div>
+        <button class="cal-nav" id="calNext" onclick="chMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
     </div>
-    <div class="cal-grid" id="calGrid"></div>
-  </div>
-  <div class="slbl">Total</div>
-  <div class="overall-grid" id="ovGrid"></div>
-  <div class="slbl" style="margin-top:6px">Reflexión del día</div>
-  <div class="reflex-date" id="rDate" style="padding-top:0;padding-bottom:4px"></div>
-  <div class="reflex-box" id="rBox" style="margin-bottom:0">
-    <textarea class="reflex-ta" id="rTa" placeholder="¿Cómo han ido los hábitos hoy? ¿Qué ha frenado? ¿Qué ha funcionado?" maxlength="600"></textarea>
-    <div class="reflex-footer">
-      <div class="reflex-pts">Escribe algo y gana <span>+10 pts</span></div>
-      <button class="reflex-save" id="rSave" onclick="saveReflex()">Guardar</button>
+    <div class="slbl">Totales</div>
+    <div class="overall-grid" id="ovGrid"></div>
+    <div class="slbl" style="margin-top:6px">Reflexión del día</div>
+    <div class="reflex-date" id="rDate" style="padding-top:0;padding-bottom:4px"></div>
+    <div class="reflex-box" id="rBox" style="margin-bottom:0">
+      <textarea class="reflex-ta" id="rTa" placeholder="¿Cómo han ido los hábitos hoy? ¿Qué ha frenado? ¿Qué ha funcionado?" maxlength="600"></textarea>
+      <div class="reflex-footer">
+        <div class="reflex-pts">Escribe algo y gana <span>+10 pts</span></div>
+        <button class="reflex-save" id="rSave" onclick="saveReflex()">Guardar</button>
+      </div>
     </div>
+    <div class="reflex-hist-title" id="rHistTitle"></div>
+    <div id="rHist" style="padding-bottom:20px"></div>
   </div>
-  <div class="reflex-hist-title" id="rHistTitle"></div>
-  <div id="rHist" style="padding-bottom:20px"></div>
 </div>
 
 <!-- SOCIAL -->
@@ -2187,29 +2353,503 @@ function renderLineChart(s){
 }
 
 function calcStreak(id,s){let n=s.done[id]?1:0;for(let i=1;i<=365;i++){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().slice(0,10);if(s.history[ds]&&s.history[ds].includes(id))n++;else break;}return n;}
+
+// ─── Helpers v2 ───
+function habitsToday(){
+  const dow=new Date().getDay();
+  return H.filter(h=>!h.days||h.days.length===0||h.days.includes(dow));
+}
+function isoDayOffset(off){const d=new Date();d.setDate(d.getDate()-off);return d.toISOString().slice(0,10);}
+
 function renderStats(){
   const s=getS();
   document.getElementById('statsDate').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const sg=document.getElementById('strGrid');sg.innerHTML='';
-  H.forEach(h=>{const str=calcStreak(h.id,s);sg.innerHTML+=`<div class="str-card"><div class="str-icon">${ICONS[h.icon||h.id]}</div><div class="str-val">${str}</div><div class="str-name">${h.name}</div></div>`;});
-  setTimeout(()=>renderLineChart(s),50);
-  const wc=document.getElementById('wChart');wc.innerHTML='';const now=new Date();
-  for(let i=6;i>=0;i--){
-    const d=new Date(now);d.setDate(now.getDate()-i);const ds=d.toISOString().slice(0,10),isT=i===0;
-    const done=isT?Object.keys(s.done).length:(s.history[ds]?s.history[ds].length:0);
-    const pct=Math.round((done/H.length)*100);let bc=pct>=100?'full':pct>=50?'ok':'';if(isT&&pct>0)bc='today';
-    wc.innerHTML+=`<div class="ccol"><div class="cbar-w"><div class="cbar ${bc}" style="height:${Math.max(pct,2)}%"></div></div><div class="cday">${DS[d.getDay()]}</div><div class="cpct">${pct>0?pct+'%':''}</div></div>`;
-  }
+  renderBlockTrend(s);
+  renderBlockWeak(s);
+  renderBlockStrong(s);
+  renderBlockPatterns(s);
+  renderBlockRecords(s);
   renderCal(s);
+  renderOvGrid(s);
+}
+
+// ─── Helpers v3 (análisis) ───
+function habitRate(h,s,days){
+  let exp=0,done=0;
+  for(let i=0;i<days;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const dow=d.getDay();
+    if(h.days&&h.days.length&&!h.days.includes(dow))continue;
+    exp++;
+    const ds=d.toISOString().slice(0,10);
+    if(i===0){if(s.done[h.id])done++;}
+    else{if((s.history[ds]||[]).includes(h.id))done++;}
+  }
+  return {exp,done,rate:exp?done/exp:0};
+}
+function daysSince(h,s){
+  if(s.done[h.id])return 0;
+  for(let i=1;i<=365;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toISOString().slice(0,10);
+    if((s.history[ds]||[]).includes(h.id))return i;
+  }
+  return null;
+}
+function rateByDow(s,days=60){
+  const stats=Array(7).fill(null).map(()=>({exp:0,done:0}));
+  for(let i=0;i<days;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const dow=d.getDay();
+    const expected=H.filter(h=>!h.days||h.days.length===0||h.days.includes(dow));
+    if(!expected.length)continue;
+    const ds=d.toISOString().slice(0,10);
+    const did=i===0?Object.keys(s.done):(s.history[ds]||[]);
+    stats[dow].exp+=expected.length;
+    stats[dow].done+=expected.filter(h=>did.includes(h.id)).length;
+  }
+  return stats.map((x,i)=>({dow:i,rate:x.exp?x.done/x.exp:0,exp:x.exp}));
+}
+function weeklyRates(s){
+  const weeks=[];
+  for(let w=3;w>=0;w--){
+    let exp=0,done=0;
+    for(let day=w*7;day<(w+1)*7;day++){
+      const d=new Date();d.setDate(d.getDate()-day);
+      const dow=d.getDay();
+      const expected=H.filter(h=>!h.days||h.days.length===0||h.days.includes(dow));
+      if(!expected.length)continue;
+      const ds=d.toISOString().slice(0,10);
+      const did=day===0?Object.keys(s.done):(s.history[ds]||[]);
+      exp+=expected.length;
+      done+=expected.filter(h=>did.includes(h.id)).length;
+    }
+    weeks.push({exp,done,rate:exp?done/exp:0});
+  }
+  return weeks;
+}
+function totalDoneEver(s){return Object.values(s.history).reduce((a,v)=>a+v.length,0)+Object.keys(s.done).length;}
+function totalDaysActive(s){
+  const set=new Set(Object.keys(s.history));
+  if(Object.keys(s.done).length>0)set.add(td());
+  return set.size;
+}
+function isNovato(s){return totalDaysActive(s)<14;}
+
+// ─── Mensajes emocionales contextuales ───
+function trendMsg(trend,lastPct){
+  if(trend==='up'){
+    if(lastPct>=80)return 'Subiendo y arriba. Esto funciona.';
+    if(lastPct>=50)return 'Vas en buena dirección.';
+    return 'Empiezas a remontar.';
+  }
+  if(trend==='down'){
+    if(lastPct>=50)return 'Has bajado, pero sigues fuerte.';
+    if(lastPct>=25)return 'Has bajado. Recuperable.';
+    return 'Has caído. Empieza por uno solo mañana.';
+  }
+  if(lastPct>=70)return 'Constante. Buen nivel.';
+  if(lastPct>=40)return 'Te mantienes. ¿Subes la próxima?';
+  return 'Sin cambios. Un solo hábito basta para arrancar.';
+}
+function trendState(trend,lastPct){
+  if(trend==='up')return lastPct>=50?'high':'medium';
+  if(trend==='down')return lastPct>=40?'medium':'broken';
+  return lastPct>=50?'medium':'low';
+}
+function weakInsight(rate){
+  if(rate<0.15)return 'Empieza por aquí. Un día basta para arrancar.';
+  if(rate<0.4)return 'Aquí está tu palanca de mejora.';
+  return 'Aquí es donde más puedes ganar.';
+}
+function strongInsight(rate,streak){
+  if(streak>=7)return 'Sólido. No lo sueltes.';
+  if(rate>=0.8)return 'Tu hábito más fuerte.';
+  return 'Va bien. Sigue.';
+}
+function patternInsight(best,worst){
+  const dn=['domingos','lunes','martes','miércoles','jueves','viernes','sábados'];
+  const diff=best.rate-worst.rate;
+  if(diff>0.4)return `Los ${dn[best.dow]} cumples mucho más que los ${dn[worst.dow]}.`;
+  if(diff>0.2)return `Tus ${dn[best.dow]} son tu día fuerte.`;
+  return 'Tu rendimiento es parecido todos los días.';
+}
+function recordsHighlight(cur,best){
+  if(best===0)return null;
+  if(cur>0&&cur>=best)return 'Estás en tu mejor versión.';
+  if(cur>0&&cur>=best*0.8)return `Te faltan ${best-cur} día${best-cur===1?'':'s'} para batir tu récord.`;
+  if(cur===0&&best>=3)return `Tu mejor versión fue ${best} días. Puedes volver.`;
+  if(cur>0)return `Apuntas a tu récord: ${best} días.`;
+  return null;
+}
+
+// ─── Render ───
+function emptyBlock(msg,days){
+  const left=14-days;
+  return `<div class="block-empty"><div class="be-msg">${msg}</div><div class="be-days">${days}/14 días con datos</div></div>`;
+}
+
+function renderBlockTrend(s){
+  const el=document.getElementById('blockTrend');if(!el)return;
+  const days=totalDaysActive(s);
+  const weeks=weeklyRates(s);
+  const last=weeks[3].rate,first=weeks[0].rate;
+  const lastPct=Math.round(last*100);
+  const delta=Math.round((last-first)*100);
+  const trend=delta>5?'up':delta<-5?'down':'eq';
+  const icon={up:'↑',down:'↓',eq:'='}[trend];
+  const cls={up:'up',down:'down',eq:''}[trend];
+  // Novato: <7 días, no hay base para comparar
+  if(days<7){
+    el.outerHTML=`<div class="block-empty" id="blockTrend"><div class="be-msg">Tu primera semana en marcha. Vuelve en ${7-days} día${7-days===1?'':'s'} para ver tu tendencia.</div><div class="be-days">${days}/7 días</div></div>`;
+    return;
+  }
+  const txt=delta>0?`+${delta}% vs hace 4 semanas`:delta<0?`${delta}% vs hace 4 semanas`:`Estable últimas 4 semanas`;
+  const msg=days<28?'Aún no hay 4 semanas completas. La tendencia se afina con el tiempo.':trendMsg(trend,lastPct);
+  const max=Math.max(...weeks.map(w=>w.rate),0.01);
+  const praxSt=trendState(trend,lastPct);
+  el.innerHTML=`
+    <div class="bt-head">
+      <div class="bt-prax">${praxImg(64,praxSt,'default')}</div>
+      <div class="bt-main">
+        <div class="bt-top">
+          <div class="bt-pct">${lastPct}%<span class="bt-arrow ${cls}">${icon}</span></div>
+          <div class="bt-delta ${cls}">${txt}</div>
+        </div>
+        <div class="bt-msg">${msg}</div>
+      </div>
+    </div>
+    <div class="bt-bars">
+      ${weeks.map((w,i)=>`<div class="bt-bar-wrap"><div class="bt-bar" style="height:${Math.max(w.rate/max*100,3)}%"></div><div class="bt-bar-lbl">${i===3?'esta':'-'+(3-i)}</div></div>`).join('')}
+    </div>`;
+}
+
+function renderBlockWeak(s){
+  const el=document.getElementById('blockWeak');if(!el)return;
+  const days=totalDaysActive(s);
+  if(!H.length){el.outerHTML=`<div class="block-empty" id="blockWeak"><div class="be-msg">Aún no has añadido hábitos.</div></div>`;return;}
+  if(days<14){el.outerHTML=`<div class="block-empty" id="blockWeak"><div class="be-msg">Identifico tu hábito más débil en 14 días.</div><div class="be-days">${days}/14 días</div></div>`;return;}
+  const stats=H.map(h=>({h,...habitRate(h,s,30)})).filter(x=>x.exp>0);
+  if(!stats.length){el.outerHTML=`<div class="block-empty" id="blockWeak"><div class="be-msg">Sin datos suficientes en 30 días.</div></div>`;return;}
+  const weak=stats.sort((a,b)=>a.rate-b.rate)[0];
+  const since=daysSince(weak.h,s);
+  const rateOver7=Math.round(weak.rate*7);
+  el.innerHTML=`
+    <div class="bx-name">${weak.h.name}</div>
+    <div class="bx-stat">${rateOver7} de cada 7 días · ${Math.round(weak.rate*100)}%</div>
+    ${since===null?'':since===0?`<div class="bx-sub">Hecho hoy.</div>`:`<div class="bx-sub">Última vez: hace ${since} día${since===1?'':'s'}.</div>`}
+    <div class="bx-context">${weakInsight(weak.rate)}</div>`;
+}
+
+function renderBlockStrong(s){
+  const el=document.getElementById('blockStrong');if(!el)return;
+  const days=totalDaysActive(s);
+  if(!H.length){el.outerHTML=`<div class="block-empty" id="blockStrong"><div class="be-msg">Aún no has añadido hábitos.</div></div>`;return;}
+  if(days<14){el.outerHTML=`<div class="block-empty" id="blockStrong"><div class="be-msg">Identifico tu hábito más fuerte en 14 días.</div><div class="be-days">${days}/14 días</div></div>`;return;}
+  const stats=H.map(h=>({h,...habitRate(h,s,30)})).filter(x=>x.exp>0);
+  if(!stats.length){el.outerHTML=`<div class="block-empty" id="blockStrong"><div class="be-msg">Sin datos suficientes en 30 días.</div></div>`;return;}
+  const strong=stats.sort((a,b)=>b.rate-a.rate)[0];
+  const str=calcStreak(strong.h.id,s);
+  const rateOver7=Math.round(strong.rate*7);
+  el.innerHTML=`
+    <div class="bx-name">${strong.h.name}</div>
+    <div class="bx-stat">${rateOver7} de cada 7 días · ${Math.round(strong.rate*100)}%</div>
+    ${str>0?`<div class="bx-sub">Racha actual: ${str} día${str===1?'':'s'}.</div>`:''}
+    <div class="bx-context">${strongInsight(strong.rate,str)}</div>`;
+}
+
+function renderBlockPatterns(s){
+  const el=document.getElementById('blockPatterns');if(!el)return;
+  const days=totalDaysActive(s);
+  if(days<21){el.outerHTML=`<div class="block-empty" id="blockPatterns"><div class="be-msg">Los patrones por día de la semana aparecen al cumplir 21 días.</div><div class="be-days">${days}/21 días</div></div>`;return;}
+  const rates=rateByDow(s,60).filter(r=>r.exp>0);
+  if(rates.length<3){el.outerHTML=`<div class="block-empty" id="blockPatterns"><div class="be-msg">Aún no hay variedad de días suficiente.</div></div>`;return;}
+  const best=[...rates].sort((a,b)=>b.rate-a.rate)[0];
+  const worst=[...rates].sort((a,b)=>a.rate-b.rate)[0];
+  const days7=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  el.innerHTML=`
+    <div class="bp2-row"><div class="bp2-lbl">Día fuerte</div><div class="bp2-val">${days7[best.dow]}</div><div class="bp2-pct">${Math.round(best.rate*100)}%</div></div>
+    <div class="bp2-row"><div class="bp2-lbl">Día débil</div><div class="bp2-val">${days7[worst.dow]}</div><div class="bp2-pct">${Math.round(worst.rate*100)}%</div></div>
+    <div class="bx-context" style="padding:0 0 14px;border-top:none;margin-top:0">${patternInsight(best,worst)}</div>`;
+}
+
+function renderBlockRecords(s){
+  const el=document.getElementById('blockRecords');if(!el)return;
+  const cur=overallStreakGlobal(s);
+  const indiv=H.reduce((mx,h)=>Math.max(mx,calcStreak(h.id,s)),0);
+  const best=Math.max(s.bestStreak||0,cur,indiv);
+  const totalDays=totalDaysActive(s);
+  const hl=recordsHighlight(cur,best);
+  el.innerHTML=`
+    <div class="br-row"><div class="br-lbl">Racha actual</div><div class="br-val">${cur}<small>días</small></div></div>
+    <div class="br-row"><div class="br-lbl">Mejor racha</div><div class="br-val">${best}<small>días</small></div></div>
+    <div class="br-row"><div class="br-lbl">Días activos</div><div class="br-val">${totalDays}<small>en total</small></div></div>
+    ${hl?`<div class="br-highlight">${hl}</div>`:''}`;
+}
+
+function renderOvGrid(s){
+  const ov=document.getElementById('ovGrid');if(!ov)return;
   const tot=Object.keys(s.history).length+(Object.keys(s.done).length>0?1:0);
   const totH=Object.values(s.history).reduce((a,v)=>a+v.length,0)+Object.keys(s.done).length;
   const bestStr=H.reduce((mx,h)=>Math.max(mx,calcStreak(h.id,s)),0);
-  document.getElementById('ovGrid').innerHTML=`
+  ov.innerHTML=`
     <div class="big-card"><div class="big-val">${s.points}</div><div class="big-lbl">Puntos</div></div>
     <div class="big-card"><div class="big-val">${tot}</div><div class="big-lbl">Días activos</div></div>
     <div class="big-card"><div class="big-val">${totH}</div><div class="big-lbl">Hábitos hechos</div></div>
     <div class="big-card"><div class="big-val">${bestStr}</div><div class="big-lbl">Mejor racha</div></div>`;
 }
+
+function renderBlockStatus(s){
+  const el=document.getElementById('blockStatus');if(!el)return;
+  const today=habitsToday();
+  const done=today.filter(h=>s.done[h.id]).length;
+  const total=today.length||1;
+  const pct=Math.round(done/total*100);
+  const nivel=pct>=80?'ALTO':pct>=40?'MEDIO':'BAJO';
+  // Trend vs ayer (mismo ratio)
+  const y=isoDayOffset(1);
+  const dowY=new Date(Date.now()-86400000).getDay();
+  const expY=H.filter(h=>!h.days||h.days.length===0||h.days.includes(dowY));
+  const yDone=(s.history[y]||[]).filter(id=>expY.find(h=>h.id===id)).length;
+  const yPct=expY.length?Math.round(yDone/expY.length*100):0;
+  let trend='eq';
+  if(pct>yPct+5)trend='up';
+  else if(pct<yPct-5)trend='down';
+  const trendIcon={up:'↑',down:'↓',eq:'='}[trend];
+  const trendClass={up:'up',down:'down',eq:''}[trend];
+  const msgs={
+    ALTO:{up:'Vas mejor que ayer.',down:'Aún arriba, pero bajando.',eq:'Mantienes el ritmo.'},
+    MEDIO:{up:'Subiendo. Sigue.',down:'Estás cayendo.',eq:'Estable. Puedes más.'},
+    BAJO:{up:'Empezando a remontar.',down:'Vas a la baja.',eq:'Necesitas mover algo.'}
+  };
+  const internalState={ALTO:'high',MEDIO:'medium',BAJO:'broken'}[nivel];
+  el.innerHTML=`
+    <div class="bs-prax">${praxImg(84,internalState,'default')}</div>
+    <div class="bs-info">
+      <div class="bs-nivel">${nivel}<span class="bs-trend ${trendClass}">${trendIcon}</span></div>
+      <div class="bs-msg">${msgs[nivel][trend]}</div>
+      <div class="bs-ratio">${done}/${total} hábitos · ${pct}%</div>
+    </div>`;
+}
+
+function pickNextHabit(s){
+  const today=habitsToday();
+  const pending=today.filter(h=>!s.done[h.id]);
+  if(!pending.length)return null;
+  const now=new Date(),mins=now.getHours()*60+now.getMinutes();
+  // 1. Ventana horaria activa: dormir 22:30-23:15
+  const sleep=pending.find(h=>h.name.toLowerCase().includes('dormir'));
+  if(sleep&&mins>=22*60+30&&mins<23*60+15)return {h:sleep,reason:'Ventana activa: 23:00-23:15.'};
+  // 2. Rompe racha
+  for(const h of pending){
+    const str=calcStreak(h.id,s);
+    if(str>=2)return {h,reason:`Pierdes ${str} días de racha si no lo haces.`};
+  }
+  // 3. Más puntos
+  pending.sort((a,b)=>(b.pts||0)-(a.pts||0));
+  return {h:pending[0],reason:`Pendiente · +${pending[0].pts||10} pts`};
+}
+
+function renderBlockAction(s){
+  const el=document.getElementById('blockAction');if(!el)return;
+  const next=pickNextHabit(s);
+  if(!next){
+    el.className='block-action closed';
+    el.innerHTML=`<div class="ba-label">Hoy</div><div class="ba-habit">Día cerrado.</div><div class="ba-reason">Vuelve mañana.</div>`;
+    el.onclick=null;
+    return;
+  }
+  el.className='block-action';
+  el.innerHTML=`<div class="ba-label">Te toca ahora</div><div class="ba-habit">${next.h.name}</div><div class="ba-reason">${next.reason}</div>`;
+  el.onclick=()=>goTo('inicio');
+}
+
+function renderHabitListV2(s){
+  const el=document.getElementById('habitListV2');if(!el)return;
+  const today=habitsToday();
+  const pendientes=today.filter(h=>!s.done[h.id]);
+  const hechos=today.filter(h=>s.done[h.id]);
+  // Fallado: dormir si pasó 23:15 sin hacerse
+  const now=new Date(),mins=now.getHours()*60+now.getMinutes();
+  const ordered=[...pendientes,...hechos];
+  el.innerHTML=ordered.map(h=>{
+    const done=!!s.done[h.id];
+    let cls='pendiente',label='Pendiente';
+    if(done){cls='done';label='Hecho';}
+    else if(h.name.toLowerCase().includes('dormir')&&mins>=23*60+15){cls='failed';label='Fallado';}
+    return `<div class="hl2-row ${cls}">
+      <div class="hl2-icon"></div>
+      <div class="hl2-name">${h.name}</div>
+      <div class="hl2-state">${label}</div>
+    </div>`;
+  }).join('');
+  if(!today.length)el.innerHTML=`<div class="hl2-row"><div class="hl2-name" style="color:var(--w3)">Sin hábitos programados hoy.</div></div>`;
+}
+
+function overallStreakGlobal(s){
+  let n=0;
+  const today=habitsToday();
+  if(today.length>0&&today.every(h=>s.done[h.id]))n++;
+  for(let i=1;i<=365;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const dow=d.getDay();
+    const expected=H.filter(h=>!h.days||h.days.length===0||h.days.includes(dow));
+    if(expected.length===0){n++;continue;}
+    const ds=d.toISOString().slice(0,10);
+    const did=s.history[ds]||[];
+    if(expected.every(h=>did.includes(h.id)))n++;
+    else break;
+  }
+  return n;
+}
+
+function renderBlockStreak(s){
+  const el=document.getElementById('blockStreak');if(!el)return;
+  const cur=overallStreakGlobal(s);
+  const best=Math.max(s.bestStreak||0,cur,H.reduce((mx,h)=>Math.max(mx,calcStreak(h.id,s)),0));
+  const today=habitsToday();
+  const pendientes=today.filter(h=>!s.done[h.id]).length;
+  const atRisk=cur>=1&&pendientes>0;
+  el.innerHTML=`
+    <div class="bd-num">${cur}<small>días seguidos</small></div>
+    <div class="bd-best">Récord: ${best} días</div>
+    ${atRisk?`<div class="bd-risk">Romperás la racha si fallas hoy.</div>`:''}`;
+}
+
+function renderBlockProgress(s){
+  const el=document.getElementById('blockProgress');if(!el)return;
+  const dayLetters=['D','L','M','X','J','V','S'];
+  let cumplidos=0;
+  const marks=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const dow=d.getDay(),ds=d.toISOString().slice(0,10);
+    const expected=H.filter(h=>!h.days||h.days.length===0||h.days.includes(dow));
+    let done;
+    if(i===0)done=expected.filter(h=>s.done[h.id]).length;
+    else done=(s.history[ds]||[]).filter(id=>expected.find(h=>h.id===id)).length;
+    let cls='fail';
+    if(expected.length===0)cls='full';
+    else if(done>=expected.length)cls='full';
+    else if(done>0)cls='partial';
+    if(cls==='full'&&expected.length>0)cumplidos++;
+    marks.push({cls,isToday:i===0,dow});
+  }
+  let prevCumplidos=0;
+  for(let i=13;i>=7;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const dow=d.getDay(),ds=d.toISOString().slice(0,10);
+    const expected=H.filter(h=>!h.days||h.days.length===0||h.days.includes(dow));
+    if(expected.length===0)continue;
+    const did=s.history[ds]||[];
+    if(expected.every(h=>did.includes(h.id)))prevCumplidos++;
+  }
+  const delta=cumplidos-prevCumplidos;
+  const deltaCls=delta>0?'up':delta<0?'down':'';
+  const deltaTxt=delta>0?`+${delta} vs semana pasada`:delta<0?`${delta} vs semana pasada`:`= vs semana pasada`;
+  el.innerHTML=`
+    <div class="bp-top">
+      <div class="bp-metric">${cumplidos}<small>/ 7 días</small></div>
+      <div class="bp-delta ${deltaCls}">${deltaTxt}</div>
+    </div>
+    <div class="bp-marks">${marks.map(m=>`<div class="bp-mark ${m.cls} ${m.isToday?'today':''}"></div>`).join('')}</div>
+    <div class="bp-days">${marks.map(m=>`<div class="bp-day">${dayLetters[m.dow]}</div>`).join('')}</div>`;
+}
+
+function toggleHist(){
+  const b=document.getElementById('histBody'),l=document.getElementById('histLink');
+  const open=b.style.display==='block';
+  b.style.display=open?'none':'block';
+  l.textContent=open?'Ver histórico ›':'Ocultar histórico ‹';
+  if(!open)setTimeout(()=>renderLineChart(getS()),50);
+}
+
+function habitVariant(h){
+  const n=h.name.toLowerCase();
+  if(n.includes('gym')||n.includes('ejercicio')||n.includes('entrena')||n.includes('fitness'))return'gym';
+  if(n.includes('lectura')||n.includes('leer'))return'book';
+  if(n.includes('dormir')||n.includes('sueño'))return'sleep';
+  if(n.includes('corr')||n.includes('run')||n.includes('cardio'))return'run';
+  if(n.includes('agua')||n.includes('hidrat'))return'water';
+  if(n.includes('medita'))return'meditate';
+  return'default';
+}
+
+function praxSVG(sz,state,variant){
+  const bc=state==='broken'?'#0f1012':'#1c1e22';
+  const lc=state==='broken'?'#2e2e2e':state==='high'?'oklch(0.72 0.19 35)':state==='medium'?'#dfc044':'#eceef0';
+  const bop=state==='broken'?.35:1;
+  let acc='';
+  if(variant==='gym') acc=`<ellipse cx="17" cy="63" rx="7" ry="3.5" fill="#252525"/><ellipse cx="63" cy="63" rx="7" ry="3.5" fill="#252525"/><rect x="14" y="61" width="52" height="4" rx="2" fill="#2e2e2e"/>`;
+  else if(variant==='book') acc=`<path d="M22 64 Q40 58 58 64 L58 77 Q40 71 22 77 Z" fill="#222426"/><line x1="40" y1="58" x2="40" y2="77" stroke="#3a3a3a" stroke-width="1.5"/>`;
+  else if(variant==='sleep') acc=`<path d="M26 10 Q40 3 54 10 L52 19 Q40 13 28 19 Z" fill="#222426"/><text x="54" y="18" fill="${lc}" font-size="8" font-family="monospace" opacity=".65">zz</text>`;
+  else if(variant==='run') acc=`<rect x="21" y="29" width="38" height="5" rx="2.5" fill="${lc}" opacity=".45"/>`;
+  else if(variant==='water') acc=`<path d="M35 62 C34 72 35 80 40 82 C45 80 46 72 45 62 Z" fill="#1a3a5c" opacity=".8"/>`;
+  else if(variant==='meditate') acc=`<path d="M26 74 Q40 68 54 74" stroke="${lc}" stroke-width="1.5" fill="none" opacity=".4"/><path d="M30 78 Q40 73 50 78" stroke="${lc}" stroke-width="1" fill="none" opacity=".25"/>`;
+  const glow=state==='high'?`<ellipse cx="40" cy="75" rx="24" ry="8" fill="${lc}" opacity=".16"/>`:'';
+  const h=Math.round(sz*1.1);
+  return `<svg width="${sz}" height="${h}" viewBox="0 0 80 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+    ${glow}
+    <path d="M40 5C27 5 15 14 11 28C7 43 9 59 19 71C25 78 32 83 40 83C48 83 55 78 61 71C71 59 73 43 69 28C65 14 53 5 40 5Z" fill="${bc}"/>
+    <path d="M46 23L33 47H43L37 67L56 41H44Z" fill="${lc}" opacity="${bop}"/>
+    ${acc}
+  </svg>`;
+}
+
+// Mapas internal-state → nombres de archivo PNG
+const PRAX_STATE_FILE={high:'activo',medium:'enfocado',low:'bajo',broken:'roto'};
+const PRAX_VARIANT_FILE={gym:'ejercicio',book:'lectura',sleep:'sueno',run:'running',water:'agua',meditate:'meditacion'};
+
+function praxImg(sz,state,variant){
+  const stateName=PRAX_STATE_FILE[state]||'neutro';
+  const variantName=PRAX_VARIANT_FILE[variant];
+  const file=variantName?`prax-${variantName}.png`:`prax-${stateName}.png`;
+  const fb=praxSVG(sz,state,variant);
+  const h=Math.round(sz*1.2);
+  return `<div class="prax-img-wrap" style="width:${sz}px;height:${h}px">
+    <span class="prax-img-halo prax-halo-${stateName}"></span>
+    <img class="prax-img" src="assets/prax/${file}" alt="" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='block'"/>
+    <div class="prax-img-fallback" style="display:none">${fb}</div>
+  </div>`;
+}
+
+function renderPrax(s){
+  const el=document.getElementById('praxSection');
+  if(!el||!H.length)return;
+  const energies=H.map(h=>{
+    const str=calcStreak(h.id,s);
+    const done=!!s.done[h.id];
+    return Math.min(done?40+Math.min(str*8,60):Math.min(str*7,55),100);
+  });
+  const gE=Math.round(energies.reduce((a,b)=>a+b,0)/energies.length);
+  const gSt=gE>=75?'high':gE>=50?'medium':gE>=25?'low':'broken';
+  const msgs={high:'Modo Acción activado. Sigue.',medium:'Bien. No te detengas.',low:'Activa más hábitos hoy.',broken:'Sin acción no hay resultado.'};
+  const glowC=gSt==='high'?'oklch(0.72 0.19 35 / .2)':gSt==='medium'?'rgba(240,192,64,.12)':'transparent';
+  let html=`<div class="prax-global-card prax-state-${gSt}" style="--prax-glow:${glowC}">
+    <div class="prax-mascot-wrap">${praxImg(72,gSt,'default')}</div>
+    <div class="prax-global-info">
+      <div class="prax-global-name">PRAX</div>
+      <div class="prax-global-msg">${msgs[gSt]}</div>
+      <div class="prax-ebar"><div class="prax-efill" style="width:${gE}%"></div></div>
+      <div class="prax-elabels"><span>Energía global</span><span>${gE}%</span></div>
+    </div>
+  </div><div class="prax-habit-grid">`;
+  H.forEach((h,i)=>{
+    const e=energies[i],str=calcStreak(h.id,s),done=!!s.done[h.id];
+    const st=e>=75?'high':e>=50?'medium':e>=25?'low':'broken';
+    const msg=done&&str>5?'Imparable.':done?'Sigue fuerte.':str>3?'No pares.':str>0?'Cumple hoy.':'Empieza ya.';
+    html+=`<div class="prax-hcard prax-state-${st}">
+      ${str>0?`<div class="prax-hstreak">${str}</div>`:''}
+      <div class="prax-svg-el">${praxImg(40,st,habitVariant(h))}</div>
+      <div class="prax-hname">${h.name}</div>
+      <div class="prax-hmsg">${msg}</div>
+      <div class="prax-hbar"><div class="prax-hbarfill" style="width:${e}%"></div></div>
+    </div>`;
+  });
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
 function renderCal(s){
   const yr=calDate.getFullYear(),mo=calDate.getMonth(),todayStr=td();
   document.getElementById('calTitle').textContent=MES[mo]+' '+yr;
