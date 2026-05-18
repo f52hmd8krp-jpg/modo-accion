@@ -670,6 +670,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .dur-btn span{font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace}
 .dur-btn.on span{color:var(--w2)}
 
+/* ═══ MÍNIMOS WIZARD ═══ */
+.min-habit-row{padding:13px 0;border-bottom:1px solid var(--b1)}
+.min-habit-row:last-child{border-bottom:none}
+.min-habit-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.min-habit-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.min-habit-icon svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.min-habit-name{font-size:13px;color:var(--w2);flex:1}
+.min-habit-val{font-family:'Anton',sans-serif;font-size:18px;color:var(--lvl-accent);flex-shrink:0}
+.min-days-btns{display:flex;gap:5px}
+.min-day-btn{flex:1;padding:8px 0;background:transparent;border:1px solid var(--b1);border-radius:8px;color:var(--w3);font-size:12px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s}
+.min-day-btn.on{background:var(--lvl-accent);border-color:var(--lvl-accent);color:#1a0a04;font-weight:700}
+/* Mínimos en el grupo */
+.mins-block{margin:0 22px 18px;padding:14px 16px;background:var(--s1);border:1px solid var(--b1);border-radius:14px}
+.mins-habit-row{margin-bottom:12px}
+.mins-habit-row:last-child{margin-bottom:0}
+.mins-habit-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.mins-habit-hdr-name{font-size:11px;color:var(--w2);flex:1}
+.mins-habit-hdr-target{font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace}
+.mins-member-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.mins-member-name{font-size:10px;color:var(--w3);width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.mins-bar-w{flex:1;height:4px;background:var(--b1);border-radius:2px}
+.mins-bar{height:4px;border-radius:2px;background:var(--w3);transition:width .5s}
+.mins-bar.ok{background:#7ec87e}
+.mins-bar.warn{background:#FFD24C}
+.mins-cnt{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--w3);width:28px;text-align:right;flex-shrink:0}
+.mins-cnt.ok{color:#7ec87e}
 /* ═══ REGLAS PANEL ═══ */
 .rule-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--b1)}
 .rule-item:last-child{border-bottom:none}
@@ -1032,6 +1058,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   <div class="slbl">Grupo</div>
   <div id="socGroup" style="padding:0 22px 8px"></div>
   <div id="socStreak"></div>
+  <div class="slbl" id="socMinsLbl" style="display:none">Mínimos semanales</div>
+  <div id="socMins" style="display:none"></div>
   <div class="slbl" id="socRaceLbl" style="display:none">Podio</div>
   <div id="socRace" style="display:none"></div>
   <div class="slbl" id="socChallengeLbl" style="display:none">Reto de la semana</div>
@@ -1068,6 +1096,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <div class="wstep" id="ws2"></div>
       <div class="wstep" id="ws3"></div>
       <div class="wstep" id="ws4"></div>
+      <div class="wstep" id="ws5"></div>
     </div>
 
     <!-- Paso 1: nombre -->
@@ -1087,8 +1116,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <button class="btn btn-g" onclick="wizardBack(2)">Atrás</button>
     </div>
 
-    <!-- Paso 3: duración -->
+    <!-- Paso 3: mínimos por hábito -->
     <div class="wizard-page" id="wp3">
+      <div class="m-title">Mínimos</div>
+      <div class="m-sub">¿Cuántos días a la semana como mínimo por hábito?</div>
+      <div id="minHabitList" style="margin-bottom:20px"></div>
+      <button class="btn btn-w" onclick="wizardNext(3)">Siguiente</button>
+      <button class="btn btn-g" onclick="wizardBack(3)">Atrás</button>
+    </div>
+
+    <!-- Paso 4: duración -->
+    <div class="wizard-page" id="wp4">
       <div class="m-title">Duración</div>
       <div class="m-sub">¿Cuánto dura la competición?</div>
       <div id="durBtns" style="margin-bottom:20px">
@@ -1097,12 +1135,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <button class="dur-btn" id="dur-30" onclick="selDur(30)">1 mes <span>30 días</span></button>
         <button class="dur-btn" id="dur-0" onclick="selDur(0)">Sin límite <span>Hasta que decidáis</span></button>
       </div>
-      <button class="btn btn-w" onclick="wizardNext(3)">Siguiente</button>
-      <button class="btn btn-g" onclick="wizardBack(3)">Atrás</button>
+      <button class="btn btn-w" onclick="wizardNext(4)">Siguiente</button>
+      <button class="btn btn-g" onclick="wizardBack(4)">Atrás</button>
     </div>
 
-    <!-- Paso 4: reglas -->
-    <div class="wizard-page" id="wp4">
+    <!-- Paso 5: reglas -->
+    <div class="wizard-page" id="wp5">
       <div class="m-title">Reglas</div>
       <div class="m-sub">Al crear el grupo aceptas estas reglas para todos los participantes.</div>
       <div style="margin-bottom:22px">
@@ -1113,7 +1151,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
         <div class="rule-item"><div class="rule-num">5</div><div class="rule-txt"><strong>Si ves que un compañero flaquea, motívalo.</strong> Esto va de todos.</div></div>
       </div>
       <button class="btn btn-w" onclick="finishGroupSetup()">Acepto — Crear grupo</button>
-      <button class="btn btn-g" onclick="wizardBack(4)">Atrás</button>
+      <button class="btn btn-g" onclick="wizardBack(5)">Atrás</button>
     </div>
   </div>
 </div>
@@ -3134,12 +3172,11 @@ function showJoinBox(){
 }
 
 // ═══ WIZARD CREAR GRUPO ═══
-let _wizDur=7, _wizHabits=[];
+let _wizDur=7, _wizHabits=[], _wizMins={};
 function createGroup(){
-  // Init wizard
-  _wizDur=7;_wizHabits=H.map(h=>h.id);
+  _wizDur=7;_wizHabits=H.map(h=>h.id);_wizMins={};
+  H.forEach(h=>{_wizMins[h.id]=3;});
   document.getElementById('compNameIn').value='';
-  // Render habit checkboxes
   const list=document.getElementById('habitCheckList');
   list.innerHTML=H.map(h=>`
     <div class="habit-check-row" onclick="toggleHabitCheck('${h.id}')">
@@ -3148,14 +3185,36 @@ function createGroup(){
       <div class="habit-check-pts">${h.pts}pts</div>
       <div class="hcheck-box on" id="hchk-${h.id}"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
     </div>`).join('');
-  // Duration buttons
   selDur(7);
-  // Show step 1
-  [1,2,3,4].forEach(i=>{
+  [1,2,3,4,5].forEach(i=>{
     document.getElementById('wp'+i).className='wizard-page'+(i===1?' on':'');
     document.getElementById('ws'+i).className='wstep'+(i===1?' on':'');
   });
   document.getElementById('mGroupSetup').classList.add('open');
+}
+function renderMinsStep(){
+  const list=document.getElementById('minHabitList');
+  list.innerHTML=_wizHabits.map(id=>{
+    const h=H.find(x=>x.id===id);if(!h)return'';
+    const cur=_wizMins[id]||3;
+    return`<div class="min-habit-row">
+      <div class="min-habit-top">
+        <div class="min-habit-icon" style="background:${h.color||'#555'}">${ICONS[h.icon||h.id]||''}</div>
+        <div class="min-habit-name">${h.name}</div>
+        <div class="min-habit-val" id="minval-${id}">${cur}d/sem</div>
+      </div>
+      <div class="min-days-btns">
+        ${[1,2,3,4,5,6,7].map(n=>`<button class="min-day-btn${n===cur?' on':''}" id="mdb-${id}-${n}" onclick="selMin('${id}',${n})">${n}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function selMin(id,n){
+  _wizMins[id]=n;
+  document.querySelectorAll(`[id^="mdb-${id}-"]`).forEach(b=>b.classList.remove('on'));
+  document.getElementById(`mdb-${id}-${n}`)?.classList.add('on');
+  const val=document.getElementById(`minval-${id}`);
+  if(val)val.textContent=n+'d/sem';
 }
 
 function toggleHabitCheck(id){
@@ -3171,6 +3230,7 @@ function selDur(d){
 function wizardNext(step){
   if(step===1&&!document.getElementById('compNameIn').value.trim()){showToast('Escribe un nombre');return;}
   if(step===2&&_wizHabits.length===0){showToast('Selecciona al menos un hábito');return;}
+  if(step===2)renderMinsStep();
   const next=step+1;
   document.getElementById('wp'+step).className='wizard-page';
   document.getElementById('wp'+next).className='wizard-page on';
@@ -3184,7 +3244,7 @@ function wizardBack(step){
 async function finishGroupSetup(){
   const code=Math.random().toString(36).substr(2,6).toUpperCase();
   const name=document.getElementById('compNameIn').value.trim()||'Competición';
-  const cfg={code,name,habits:_wizHabits,duration:_wizDur,createdAt:Date.now()};
+  const cfg={code,name,habits:_wizHabits,duration:_wizDur,minimums:_wizMins,createdAt:Date.now()};
   localStorage.setItem('grp_cfg_'+code,JSON.stringify(cfg));
   const s=getS();s.groupCode=code;saveS(s);
   await pushToLeaderboard(s);
@@ -3237,21 +3297,21 @@ function leaveGroup(){
 }
 
 async function fetchGroupData(groupCode){
-  const rkEl=document.getElementById('socRank');
-  const rkLbl=document.getElementById('socRankLbl');
   const feedEl=document.getElementById('socFeed');
   const feedLbl=document.getElementById('socFeedLbl');
   const strEl=document.getElementById('socStreak');
-  if(!rkEl)return;
-  rkEl.innerHTML=`<div style="font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace;padding:12px 0">Cargando…</div>`;
-  const sc=getSupa();if(!sc){rkEl.innerHTML='';return;}
+  if(strEl)strEl.innerHTML=`<div class="slbl" style="padding-bottom:12px">Cargando grupo…</div>`;
+  const sc=getSupa();if(!sc){if(strEl)strEl.innerHTML='';return;}
   try{
     const[lbRes,chalRes]=await Promise.all([
       sc.from('leaderboard').select('*').eq('group_code',groupCode).order('points',{ascending:false}),
       sc.from('group_challenges').select('*').eq('group_code',groupCode).order('created_at',{ascending:false}).limit(3)
     ]);
     const data=lbRes.data||[];
-    if(!data.length){rkEl.innerHTML=`<div style="font-size:11px;color:var(--w3);padding:12px 0;font-weight:300">Aún no hay miembros. Comparte el código.</div>`;return;}
+    if(!data.length){
+      if(strEl)strEl.innerHTML=`<div style="font-size:11px;color:var(--w3);padding:0 22px 12px;font-weight:300">Aún no hay miembros. Comparte el código.</div>`;
+      return;
+    }
 
     // — Racha de grupo —
     const groupStreak=calcGroupStreak(data);
@@ -3269,6 +3329,43 @@ async function fetchGroupData(groupCode){
             <div class="streak-band-sub">${groupStreak===0?'La racha está rota — ¡empezad hoy!':groupStreak===1?'Buen comienzo. ¡A por otro día!':'Todo el grupo activo '+groupStreak+' días seguidos'}</div>
           </div>
         </div>`;
+    }
+
+    // — Mínimos semanales —
+    const s=getS();
+    const cfg=s.groupCode?JSON.parse(localStorage.getItem('grp_cfg_'+s.groupCode)||'null'):null;
+    const minimums=cfg?.minimums||{};
+    const habitIds=cfg?.habits||H.map(h=>h.id);
+    const minsEl=document.getElementById('socMins');
+    const minsLbl=document.getElementById('socMinsLbl');
+    if(minsEl&&minsLbl&&Object.keys(minimums).length>0){
+      minsLbl.style.display='block';
+      minsEl.style.display='block';
+      minsEl.innerHTML=`<div class="mins-block">${
+        habitIds.filter(id=>minimums[id]>0).map(id=>{
+          const h=H.find(x=>x.id===id);if(!h)return'';
+          const target=minimums[id]||1;
+          const rows=data.map(m=>{
+            const week=m.habits_week||[];
+            const count=week.filter(w=>w.id===id).length;
+            const pct=Math.min(100,Math.round((count/target)*100));
+            const ok=count>=target;
+            const warn=!ok&&count>=Math.ceil(target/2);
+            return`<div class="mins-member-row">
+              <div class="mins-member-name">${m.display_name||'—'}</div>
+              <div class="mins-bar-w"><div class="mins-bar${ok?' ok':warn?' warn':''}" style="width:${pct}%"></div></div>
+              <div class="mins-cnt${ok?' ok':''}">${count}/${target}</div>
+            </div>`;
+          }).join('');
+          return`<div class="mins-habit-row">
+            <div class="mins-habit-hdr">
+              <div class="mins-habit-hdr-name">${h.name}</div>
+              <div class="mins-habit-hdr-target">mín. ${target} días/sem</div>
+            </div>
+            ${rows}
+          </div>`;
+        }).join('')
+      }</div>`;
     }
 
     // — Retos —
@@ -3361,7 +3458,7 @@ async function fetchGroupData(groupCode){
         <div class="feed-time">${_timeAgo(f.ts)}</div>
       </div>`).join('');
     }
-  }catch(e){rkEl.innerHTML='';}
+  }catch(e){console.error('fetchGroupData',e);}
 }
 
 function calcGroupStreak(members){
@@ -3454,10 +3551,12 @@ async function pushToLeaderboard(s){
     const weekStart=new Date();weekStart.setDate(weekStart.getDate()-weekStart.getDay());
     const weekStartStr=weekStart.toISOString().slice(0,10);
     const habitsWeek=[];
+    const todayDate=td();
     Object.entries(s.history).forEach(([date,habits])=>{
-      if(date>=weekStartStr)habits.forEach(id=>habitsWeek.push({id,name:H.find(h=>h.id===id)?.name||id,date}));
+      if(date>=weekStartStr&&date!==todayDate)habits.forEach(id=>habitsWeek.push({id,name:H.find(h=>h.id===id)?.name||id,date}));
     });
-    Object.entries(s.done).forEach(([id,d])=>habitsWeek.push({id,name:H.find(h=>h.id===id)?.name||id,date:td(),ts:d.ts||0}));
+    // Hoy: usar s.done (tiene timestamps precisos)
+    Object.entries(s.done).forEach(([id,d])=>habitsWeek.push({id,name:H.find(h=>h.id===id)?.name||id,date:todayDate,ts:d.ts||0}));
     await sc.from('leaderboard').upsert({
       user_id:user.id,display_name:name,group_code:s.groupCode||null,
       points:s.points||0,streak:overallStreak(s),
