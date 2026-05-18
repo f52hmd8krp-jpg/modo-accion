@@ -1723,12 +1723,12 @@ function overallStreak(s){
 
 // ═══ LEVEL SYSTEM ═══
 const LEVELS=[
-  {n:1, name:'INICIADO',    min:0,    max:199,  accent:'oklch(0.72 0.19 35)', bg:'#07080a', s1:'#101215', s2:'#181b1f'},
-  {n:2, name:'CONSTANTE',   min:200,  max:499,  accent:'#4da8ff',bg:'#030b22', s1:'#06133a', s2:'#0b1e52'},
-  {n:3, name:'DISCIPLINADO',min:500,  max:999,  accent:'#2edf72',bg:'#021508', s1:'#052414', s2:'#09341e'},
-  {n:4, name:'IMPARABLE',   min:1000, max:1999, accent:'#c05cff',bg:'#0c0320', s1:'#180638', s2:'#210a4a'},
-  {n:5, name:'ÉLITE',       min:2000, max:3999, accent:'#ffb020',bg:'#1a0e00', s1:'#2c1a04', s2:'#3a2208'},
-  {n:6, name:'LEYENDA',     min:4000, max:99999,accent:'#ff3a3a',bg:'#1e0202', s1:'#320404', s2:'#420606'},
+  {n:1, name:'INICIADO',    min:0,    max:199,  accent:'oklch(0.72 0.19 35)'},
+  {n:2, name:'CONSTANTE',   min:200,  max:499,  accent:'#4da8ff'},
+  {n:3, name:'DISCIPLINADO',min:500,  max:999,  accent:'#2edf72'},
+  {n:4, name:'IMPARABLE',   min:1000, max:1999, accent:'#c05cff'},
+  {n:5, name:'ÉLITE',       min:2000, max:3999, accent:'#ffb020'},
+  {n:6, name:'LEYENDA',     min:4000, max:99999,accent:'#ff3a3a'},
 ];
 
 function getLevel(pts){
@@ -1737,11 +1737,7 @@ function getLevel(pts){
 }
 
 function applyLevelTheme(lvl){
-  const r=document.documentElement.style;
-  r.setProperty('--bg',lvl.bg);
-  r.setProperty('--s1',lvl.s1);
-  r.setProperty('--s2',lvl.s2);
-  r.setProperty('--lvl-accent',lvl.accent);
+  document.documentElement.style.setProperty('--lvl-accent',lvl.accent);
 }
 
 function renderLevelBadge(pts){
