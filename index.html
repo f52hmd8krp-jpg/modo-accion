@@ -3935,13 +3935,24 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
+const APP_VERSION=41;
+(function versionCheck(){
+  const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
+  if(lastV&&lastV<APP_VERSION){
+    // Versión vieja: limpiar todo y recargar
+    localStorage.setItem('ma_app_v',APP_VERSION);
+    navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()));
+    caches.keys().then(k=>k.forEach(c=>caches.delete(c)));
+    return location.reload();
+  }
+  localStorage.setItem('ma_app_v',APP_VERSION);
+})();
 if('serviceWorker' in navigator){
   let _swRefreshing=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
     if(!_swRefreshing){_swRefreshing=true;location.reload();}
   });
   navigator.serviceWorker.register('./sw.js').then(reg=>{
-    // Forzar comprobación de nueva versión en cada visita
     reg.update().catch(()=>{});
   }).catch(()=>{});
 }
