@@ -3935,7 +3935,13 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+  let _swRefreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(!_swRefreshing){_swRefreshing=true;location.reload();}
+  });
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
 
 // ═══ SUPABASE ═══
 const SUPA_URL='https://mifhfeiuekhxmyvjnpkx.supabase.co';
