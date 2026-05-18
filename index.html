@@ -670,6 +670,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .dur-btn span{font-size:10px;color:var(--w3);font-family:'JetBrains Mono',monospace}
 .dur-btn.on span{color:var(--w2)}
 
+/* ═══ GRUPO PENDIENTE ═══ */
+.pend-conditions{margin:0 22px 16px;padding:14px 16px;background:var(--s1);border:1px solid var(--b1);border-radius:14px}
+.pend-cond-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b1);font-size:12px;color:var(--w2)}
+.pend-cond-row:last-child{border-bottom:none}
+.pend-cond-val{font-family:'Anton',sans-serif;font-size:16px;color:var(--lvl-accent);letter-spacing:.5px}
+.pend-member-row{display:flex;align-items:center;gap:10px;padding:10px 22px;border-bottom:1px solid var(--b1)}
+.pend-member-row:last-child{border-bottom:none}
+.pend-member-name{font-size:13px;color:var(--w2)}
+/* Condiciones en modal join */
+.join-cond-block{border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:4px}
+.join-cond-ttl{padding:10px 14px;background:var(--s2);font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;color:var(--w)}
+.join-cond-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(--b1);font-size:12px;color:var(--w2)}
+.join-cond-row-val{font-family:'Anton',sans-serif;font-size:15px;color:var(--lvl-accent)}
 /* ═══ MÍNIMOS WIZARD ═══ */
 .min-habit-row{padding:13px 0;border-bottom:1px solid var(--b1)}
 .min-habit-row:last-child{border-bottom:none}
@@ -1156,20 +1169,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   </div>
 </div>
 
-<!-- MODAL: REGLAS DEL GRUPO (al unirse) -->
+<!-- MODAL: CONDICIONES DEL GRUPO (al unirse) -->
 <div class="mbd" id="mGroupRules">
   <div class="modal" style="max-height:85vh;overflow-y:auto">
     <div class="m-handle"></div>
-    <div class="m-title" id="grpRulesTitle">Reglas del grupo</div>
-    <div class="m-sub" id="grpRulesSub">Lee y acepta antes de unirte.</div>
+    <div class="m-title" id="grpRulesTitle">Condiciones</div>
+    <div class="m-sub">Esto es a lo que te comprometes.</div>
+    <!-- Condiciones específicas del grupo -->
+    <div id="grpCompInfo" style="margin-bottom:18px"></div>
+    <!-- Reglas fijas -->
     <div style="margin-bottom:22px">
+      <div style="font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Reglas</div>
       <div class="rule-item"><div class="rule-num">1</div><div class="rule-txt"><strong>Cero trampas.</strong> Tu progreso es tuyo. El grupo confía en ti.</div></div>
       <div class="rule-item"><div class="rule-num">2</div><div class="rule-txt"><strong>Lo que empieces, lo terminas.</strong> No desaparezcas a mitad de competición.</div></div>
       <div class="rule-item"><div class="rule-num">3</div><div class="rule-txt"><strong>Si fallas un día, mañana doble esfuerzo.</strong> Una caída no es el final.</div></div>
       <div class="rule-item"><div class="rule-num">4</div><div class="rule-txt"><strong>El resultado importa. El proceso, más.</strong> Ganar está bien. Mejorar, mejor.</div></div>
       <div class="rule-item"><div class="rule-num">5</div><div class="rule-txt"><strong>Si ves que un compañero flaquea, motívalo.</strong> Esto va de todos.</div></div>
     </div>
-    <div id="grpCompInfo" style="margin-bottom:18px;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;font-size:11px;color:var(--w3);font-family:'JetBrains Mono',monospace;line-height:1.7"></div>
     <button class="btn btn-w" onclick="confirmJoinGroup()">Acepto — Unirme</button>
     <button class="btn btn-g" onclick="document.getElementById('mGroupRules').classList.remove('open')">Cancelar</button>
   </div>
@@ -3136,17 +3152,76 @@ async function renderSocial(){
       </div>
     </div>`;
   } else {
+    const cfg=JSON.parse(localStorage.getItem('grp_cfg_'+s.groupCode)||'null');
+    const isCreator=!!cfg;
+    const isPending=isCreator&&!cfg.startedAt;
+    const grpLabel=cfg?.name||'GRUPO';
     grp.innerHTML=`<div class="soc-code-box">
       <div style="flex:1">
-        <div class="soc-code-lbl">Código del grupo</div>
+        <div class="soc-code-lbl">${grpLabel}</div>
         <div class="soc-code-val">${s.groupCode}</div>
       </div>
       <button onclick="shareGroupCode()" style="padding:9px 14px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--w2);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer">Compartir</button>
     </div>
     <button onclick="leaveGroup()" style="width:100%;padding:10px;background:transparent;border:none;color:var(--w3);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;margin-bottom:4px">Salir del grupo</button>`;
-    fetchGroupData(s.groupCode);
-    subscribeGroupRealtime(s.groupCode);
+    if(isPending){
+      fetchPendingMembers(s.groupCode,cfg);
+    } else {
+      fetchGroupData(s.groupCode);
+      subscribeGroupRealtime(s.groupCode);
+    }
   }
+}
+
+async function fetchPendingMembers(code,cfg){
+  const strEl=document.getElementById('socStreak');
+  if(!strEl)return;
+  const durTxt=cfg.duration===0?'Sin límite':cfg.duration+' días';
+  const condRows=(cfg.habits||H.map(h=>h.id)).map(id=>{
+    const h=H.find(x=>x.id===id);if(!h)return'';
+    const n=cfg.minimums?.[id]||1;
+    return`<div class="pend-cond-row"><span>${h.name}</span><span class="pend-cond-val">${n}d/sem</span></div>`;
+  }).join('');
+  strEl.innerHTML=`
+    <div class="slbl">Condiciones de la competición</div>
+    <div class="pend-conditions">
+      ${condRows}
+      <div class="pend-cond-row"><span>Duración</span><span class="pend-cond-val">${durTxt}</span></div>
+    </div>
+    <div class="slbl">Participantes</div>
+    <div id="pendMemberList" style="padding:0 22px 8px"><div style="font-size:10px;color:var(--w3);padding:8px 0;font-family:'JetBrains Mono',monospace">Cargando…</div></div>
+    <div style="padding:0 22px 4px">
+      <button id="startBtn" class="btn btn-w" style="margin:0;opacity:.4;pointer-events:none" onclick="startGroup()">Iniciar competición</button>
+      <div style="font-size:10px;color:var(--w3);text-align:center;font-family:'JetBrains Mono',monospace;margin-top:8px;line-height:1.6">Comparte el código. Inicia cuando todos hayan aceptado.</div>
+    </div>`;
+  const sc=getSupa();if(!sc)return;
+  try{
+    const{data}=await sc.from('leaderboard').select('display_name,updated_at').eq('group_code',code).order('updated_at',{ascending:false});
+    const members=data||[];
+    const listEl=document.getElementById('pendMemberList');
+    if(listEl){
+      listEl.innerHTML=members.length===0
+        ?`<div style="font-size:11px;color:var(--w3);font-family:'JetBrains Mono',monospace;padding:4px 0">Nadie se ha unido aún.</div>`
+        :members.map(m=>`<div class="pend-member-row">
+            <div class="soc-avatar" style="width:32px;height:32px;font-size:12px;flex-shrink:0">${_initials(m.display_name||'?')}</div>
+            <div class="pend-member-name">${m.display_name||'Usuario'}</div>
+          </div>`).join('');
+    }
+    if(members.length>=1){
+      const btn=document.getElementById('startBtn');
+      if(btn){btn.style.opacity='1';btn.style.pointerEvents='auto';}
+    }
+  }catch(e){}
+}
+
+function startGroup(){
+  const s=getS();
+  const cfg=JSON.parse(localStorage.getItem('grp_cfg_'+s.groupCode)||'null');
+  if(!cfg)return;
+  cfg.startedAt=Date.now();
+  localStorage.setItem('grp_cfg_'+s.groupCode,JSON.stringify(cfg));
+  showToast('🏁 ¡Competición iniciada!');
+  renderSocial();
 }
 
 function toggleNameEdit(){
@@ -3244,10 +3319,20 @@ function wizardBack(step){
 async function finishGroupSetup(){
   const code=Math.random().toString(36).substr(2,6).toUpperCase();
   const name=document.getElementById('compNameIn').value.trim()||'Competición';
-  const cfg={code,name,habits:_wizHabits,duration:_wizDur,minimums:_wizMins,createdAt:Date.now()};
+  const cfg={code,name,habits:_wizHabits,duration:_wizDur,minimums:_wizMins,startedAt:null,createdAt:Date.now()};
   localStorage.setItem('grp_cfg_'+code,JSON.stringify(cfg));
   const s=getS();s.groupCode=code;saveS(s);
   await pushToLeaderboard(s);
+  // Intentar sincronizar config a Supabase (falla silenciosamente si columnas no existen)
+  try{
+    const sc=getSupa();if(sc){
+      const{data:{user}}=await sc.auth.getUser();if(user){
+        await sc.from('leaderboard').update({
+          group_name:name,group_habits:_wizHabits,group_duration:_wizDur,group_minimums:_wizMins
+        }).eq('user_id',user.id);
+      }
+    }
+  }catch(e){}
   document.getElementById('mGroupSetup').classList.remove('open');
   showToast('Grupo "'+name+'" creado: '+code);
   renderSocial();
@@ -3259,19 +3344,37 @@ async function joinGroup(){
   const code=(document.getElementById('joinCodeIn')?.value||'').trim().toUpperCase();
   if(code.length<4){showToast('Código inválido');return;}
   _pendingJoinCode=code;
-  // Intentar cargar config del grupo
   const sc=getSupa();
-  let cfg=null;
+  let grpName=code,grpDur=null,grpHabits=[],grpMins={};
   try{
-    const{data}=await sc.from('leaderboard').select('group_name,group_habits,group_duration').eq('group_code',code).limit(1).single();
-    if(data)cfg=data;
+    const{data}=await sc.from('leaderboard').select('display_name,group_name,group_habits,group_duration,group_minimums').eq('group_code',code).order('updated_at',{ascending:false}).limit(10);
+    if(data&&data.length){
+      const row=data[0];
+      grpName=row.group_name||code;
+      grpDur=row.group_duration??null;
+      grpHabits=row.group_habits||[];
+      grpMins=row.group_minimums||{};
+    }
   }catch(e){}
   const infoEl=document.getElementById('grpCompInfo');
-  if(cfg?.group_name){
-    infoEl.innerHTML=`Competición: <strong style="color:var(--w)">${cfg.group_name}</strong><br>Duración: ${cfg.group_duration?cfg.group_duration+'d':'Sin límite'}`;
-  } else {
-    infoEl.innerHTML='Código: <strong style="color:var(--w)">'+code+'</strong>';
-  }
+  const durTxt=grpDur===0?'Sin límite':grpDur?grpDur+' días':'—';
+  // Filas de mínimos por hábito (si disponibles)
+  const minsRows=grpHabits.length
+    ?grpHabits.map(id=>{
+        const h=H.find(x=>x.id===id);
+        const n=grpMins[id];
+        return`<div class="join-cond-row">
+          <span>${h?.name||id}</span>
+          <span class="join-cond-row-val">${n?n+'d/sem mín.':'—'}</span>
+        </div>`;
+      }).join('')
+    :`<div class="join-cond-row"><span>Código</span><span class="join-cond-row-val">${code}</span></div>`;
+  infoEl.innerHTML=`<div class="join-cond-block">
+    <div class="join-cond-ttl">${grpName}</div>
+    ${minsRows}
+    <div class="join-cond-row"><span>Duración</span><span class="join-cond-row-val">${durTxt}</span></div>
+  </div>`;
+  document.getElementById('grpRulesTitle').textContent=grpName;
   document.getElementById('mGroupRules').classList.add('open');
 }
 async function confirmJoinGroup(){
