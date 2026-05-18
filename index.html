@@ -214,6 +214,31 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .cd.full{background:var(--w);color:var(--bg);font-weight:700}
 .cd.partial{background:var(--w3);color:var(--bg)}
 .cd.missed{background:transparent;color:var(--b2)}
+/* ═══ CONSTELLATION ═══ */
+.const-tiles{padding:0 20px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.const-tile{padding:10px 8px;border:1px solid var(--b1);border-radius:10px;background:var(--s1);display:flex;flex-direction:column;gap:2px}
+.const-tile-val{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.005em;line-height:1;font-variant-numeric:tabular-nums}
+.const-tile-val.scar{color:oklch(0.65 0.22 25)}
+.const-tile-val sup{font-size:.45em;opacity:.55;vertical-align:top;margin-left:1px}
+.const-tile-lbl{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--w2);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.const-viz{padding:0 16px 0}
+.const-viz-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--w3);margin:4px 4px 8px;font-family:'JetBrains Mono',monospace}
+.const-svg{display:block;width:100%;background:radial-gradient(ellipse at top right,color-mix(in oklab,var(--lvl-accent) 8%,transparent),transparent 60%);border-radius:12px}
+.const-star{fill:var(--lvl-accent)}
+.const-star.small{fill:var(--w2)}
+.const-orphan{fill:oklch(0.65 0.22 25);opacity:.55}
+.const-link{stroke:var(--lvl-accent);stroke-width:.6;opacity:.3}
+.const-link.strong{stroke-width:1;opacity:.5}
+.const-week-label{fill:var(--w3);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase}
+.const-orphan-label{fill:oklch(0.65 0.22 25);opacity:.7;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em}
+.const-today-label{fill:var(--lvl-accent);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase}
+.const-legend{display:flex;gap:14px;margin-top:14px;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--w2);align-items:center;font-family:'JetBrains Mono',monospace}
+.const-legend>span{display:inline-flex;align-items:center;gap:6px}
+/* Sección secundaria plegable */
+.stats-secondary-toggle{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:16px 22px;background:none;border:none;border-top:1px solid var(--b1);margin-top:20px;color:var(--w3);font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:color .15s}
+.stats-secondary-toggle:hover{color:var(--w2)}
+.stats-secondary-toggle svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;transition:transform .2s}
+.stats-secondary-toggle.open svg{transform:rotate(180deg)}
 /* STATS v2 — Arquitectura de contenido por bloques */
 .block-status{margin:0 22px 14px;padding:18px;border:1px solid var(--b1);border-radius:16px;background:var(--s1);display:flex;align-items:center;gap:16px}
 .bs-prax{flex-shrink:0;width:84px;height:100px;display:flex;align-items:center;justify-content:center}
@@ -997,31 +1022,38 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <!-- STATS -->
 <div id="s-stats" class="screen">
   <div class="stats-hdr">
+    <div class="stats-date" id="statsDate" style="margin-bottom:2px"></div>
     <div class="stats-title">Datos</div>
-    <div class="stats-date" id="statsDate"></div>
   </div>
-  <!-- A. Tendencia general -->
-  <div class="slbl">Tendencia</div>
-  <div class="block-trend" id="blockTrend"></div>
 
-  <!-- B. A mejorar -->
-  <div class="slbl">A mejorar</div>
-  <div class="block-weak" id="blockWeak"></div>
+  <!-- Constellation: Summary tiles -->
+  <div class="const-tiles" id="constTiles"></div>
+  <!-- Constellation: Viz -->
+  <div class="const-viz" id="constViz"></div>
 
-  <!-- C. Funcionando -->
-  <div class="slbl">Funcionando</div>
-  <div class="block-strong" id="blockStrong"></div>
-
-  <!-- D. Récords -->
-  <div class="slbl">Récords</div>
-  <div class="block-records" id="blockRecords"></div>
-
-  <!-- E. Patrones -->
-  <div class="slbl">Patrones</div>
-  <div class="block-patterns" id="blockPatterns"></div>
-
-  <!-- Histórico (plegable) -->
-  <button class="hist-link" id="histLink" onclick="toggleHist()">Ver histórico ›</button>
+  <!-- Análisis detallado (secundario, plegable) -->
+  <button class="stats-secondary-toggle" id="statsSecToggle" onclick="toggleStatsSecondary()">
+    Análisis detallado
+    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div id="statsSecondary" style="display:none">
+    <!-- A. Tendencia general -->
+    <div class="slbl">Tendencia</div>
+    <div class="block-trend" id="blockTrend"></div>
+    <!-- B. A mejorar -->
+    <div class="slbl">A mejorar</div>
+    <div class="block-weak" id="blockWeak"></div>
+    <!-- C. Funcionando -->
+    <div class="slbl">Funcionando</div>
+    <div class="block-strong" id="blockStrong"></div>
+    <!-- D. Récords -->
+    <div class="slbl">Récords</div>
+    <div class="block-records" id="blockRecords"></div>
+    <!-- E. Patrones -->
+    <div class="slbl">Patrones</div>
+    <div class="block-patterns" id="blockPatterns"></div>
+    <!-- Histórico (plegable) -->
+    <button class="hist-link" id="histLink" onclick="toggleHist()">Ver histórico ›</button>
   <div class="hist-body" id="histBody" style="display:none">
     <div class="slbl">Progreso por hábito</div>
     <div class="chart-sec">
@@ -1055,6 +1087,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
     <div class="reflex-hist-title" id="rHistTitle"></div>
     <div id="rHist" style="padding-bottom:20px"></div>
   </div>
+  </div><!-- /statsSecondary -->
 </div>
 
 <!-- SOCIAL -->
@@ -2395,7 +2428,8 @@ function isoDayOffset(off){const d=new Date();d.setDate(d.getDate()-off);return 
 
 function renderStats(){
   const s=getS();
-  document.getElementById('statsDate').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('statsDate').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  renderConstellation(s);
   renderBlockTrend(s);
   renderBlockWeak(s);
   renderBlockStrong(s);
@@ -2403,6 +2437,128 @@ function renderStats(){
   renderBlockRecords(s);
   renderCal(s);
   renderOvGrid(s);
+}
+
+function toggleStatsSecondary(){
+  const el=document.getElementById('statsSecondary');
+  const btn=document.getElementById('statsSecToggle');
+  if(!el)return;
+  const open=el.style.display!=='none';
+  el.style.display=open?'none':'block';
+  btn.classList.toggle('open',!open);
+}
+
+// ═══ CONSTELLATION ═══
+function renderConstellation(s){
+  const DAYS=90;
+  const maxH=H.length||5;
+  const today=new Date();
+  const todayStr=td();
+
+  // Build day data
+  const days=[];
+  for(let i=0;i<DAYS;i++){
+    const d=new Date(today);d.setDate(today.getDate()-(DAYS-1-i));
+    const ds=d.toISOString().slice(0,10);
+    const dow=d.getDay();
+    let completed=0;
+    if(ds===todayStr){
+      completed=Object.keys(s.done).length;
+    } else {
+      completed=(s.history[ds]||[]).length;
+    }
+    days.push({idx:i,date:d,ds,dow,completed,broken:completed===0,today:i===DAYS-1});
+  }
+
+  // KPIs
+  const totalDone=days.reduce((a,d)=>a+d.completed,0);
+  const totalExpected=days.length*maxH;
+  const adherence=totalExpected?Math.round((totalDone/totalExpected)*100):0;
+  const streak=overallStreak(s);
+  const brokenCount=days.filter(d=>d.broken).length;
+  const pts=s.points||0;
+  const ptsLabel=pts>=10000?(pts/1000).toFixed(1)+'<sup>K</sup>':pts.toLocaleString();
+
+  const tilesEl=document.getElementById('constTiles');
+  if(tilesEl)tilesEl.innerHTML=`
+    <div class="const-tile"><div class="const-tile-val">${adherence}<sup>%</sup></div><div class="const-tile-lbl">Adherencia</div></div>
+    <div class="const-tile"><div class="const-tile-val">${streak}<sup>d</sup></div><div class="const-tile-lbl">Racha</div></div>
+    <div class="const-tile"><div class="const-tile-val scar">${brokenCount}</div><div class="const-tile-lbl">Huérfanas</div></div>
+    <div class="const-tile"><div class="const-tile-val">${ptsLabel}</div><div class="const-tile-lbl">Puntos</div></div>`;
+
+  // Constellation SVG
+  const vizEl=document.getElementById('constViz');
+  if(!vizEl)return;
+  const COLS=7;
+  const ROWS=Math.ceil(DAYS/7);
+  const W=vizEl.clientWidth-32||308;
+  const cellW=W/COLS;
+  const cellH=36;
+  const svgW=COLS*cellW+4;
+  const svgH=ROWS*cellH+30;
+
+  function nz(i){return Math.abs(((Math.sin(i*12.9898+78.233)*43758.5453)%1)-Math.floor((Math.sin(i*12.9898+78.233)*43758.5453)%1));}
+
+  const cells=[];
+  for(let i=DAYS-1;i>=0;i--){
+    const d=days[i];
+    const fromEnd=DAYS-1-i;
+    const row=Math.floor(fromEnd/7);
+    const col=COLS-1-(fromEnd%7);
+    const baseX=col*cellW+cellW/2+2;
+    const baseY=row*cellH+cellH/2+24;
+    const jx=(nz(i*3)-0.5)*7;
+    const jy=(nz(i*5+7)-0.5)*5;
+    cells.push({x:baseX+jx,y:baseY+jy,d,row,col});
+  }
+
+  const h=[];
+  h.push(`<div class="const-viz-label">Tu cielo · ${DAYS} estrellas · ${brokenCount} huérfanas</div>`);
+  h.push(`<svg class="const-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">`);
+
+  // Week labels
+  for(let r=0;r<ROWS;r++){
+    h.push(`<text x="6" y="${r*cellH+36}" class="const-week-label">S-${ROWS-r}</text>`);
+  }
+
+  // Links
+  for(const c of cells){
+    if(c.d.broken)continue;
+    const right=cells.find(o=>o.row===c.row&&o.col===c.col+1);
+    if(right&&!right.d.broken){
+      const both=c.d.completed>=maxH&&right.d.completed>=maxH;
+      h.push(`<line x1="${c.x}" y1="${c.y}" x2="${right.x}" y2="${right.y}" class="const-link${both?' strong':''}"/>`);
+    }
+    const up=cells.find(o=>o.row===c.row-1&&o.col===c.col);
+    if(up&&!up.d.broken){
+      const both=c.d.completed>=maxH&&up.d.completed>=maxH;
+      h.push(`<line x1="${c.x}" y1="${c.y}" x2="${up.x}" y2="${up.y}" class="const-link${both?' strong':''}"/>`);
+    }
+  }
+
+  // Stars
+  for(const c of cells){
+    if(c.d.broken){
+      h.push(`<circle cx="${c.x}" cy="${c.y}" r="2" class="const-orphan"/>`);
+    } else {
+      const r=1+(c.d.completed/maxH)*4;
+      const cls=c.d.completed>=maxH?'const-star':'const-star small';
+      h.push(`<circle cx="${c.x}" cy="${c.y}" r="${r}" class="${cls}"/>`);
+      if(c.d.today){
+        h.push(`<circle cx="${c.x}" cy="${c.y}" r="${r+3}" fill="none" stroke="var(--lvl-accent)" stroke-width="1" opacity="0.5"/>`);
+        h.push(`<text x="${c.x+r+6}" y="${c.y+3}" class="const-today-label">HOY</text>`);
+      }
+    }
+  }
+
+  h.push('</svg>');
+  h.push(`<div class="const-legend">
+    <span><svg width="12" height="12"><circle cx="6" cy="6" r="4" fill="var(--lvl-accent)"/></svg>Plena</span>
+    <span><svg width="12" height="12"><circle cx="6" cy="6" r="2.5" fill="var(--w2)"/></svg>Tenue</span>
+    <span style="color:oklch(0.65 0.22 25)"><svg width="12" height="12"><circle cx="6" cy="6" r="2" fill="oklch(0.65 0.22 25)"/></svg>Huérfana</span>
+  </div>`);
+
+  vizEl.innerHTML=h.join('');
 }
 
 // ─── Helpers v3 (análisis) ───
