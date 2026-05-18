@@ -3940,7 +3940,10 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
     if(!_swRefreshing){_swRefreshing=true;location.reload();}
   });
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    // Forzar comprobación de nueva versión en cada visita
+    reg.update().catch(()=>{});
+  }).catch(()=>{});
 }
 
 // ═══ SUPABASE ═══

@@ -1,4 +1,4 @@
-const CACHE = 'modo-accion-v40';
+const CACHE = 'modo-accion-v41';
 const ASSETS = [
   '/modo-accion/',
   '/modo-accion/index.html',
@@ -24,13 +24,32 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      if(res && res.status === 200 && e.request.method === 'GET'){
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-      }
-      return res;
-    }).catch(() => caches.match('/modo-accion/index.html')))
-  );
+  const url = new URL(e.request.url);
+  const isNav = e.request.mode === 'navigate'
+    || url.pathname.endsWith('/index.html')
+    || url.pathname.endsWith('/modo-accion/');
+
+  if (isNav) {
+    // Network-first para la página: siempre intenta traer la última versión
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match('/modo-accion/index.html'))
+    );
+  } else {
+    // Cache-first para assets estáticos (imágenes, JS libs, fuentes)
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+        if (res && res.status === 200 && e.request.method === 'GET') {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match('/modo-accion/index.html')))
+    );
+  }
 });
