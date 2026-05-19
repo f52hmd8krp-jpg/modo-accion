@@ -3541,9 +3541,20 @@ function shareGroupCode(){
   else prompt('Comparte este código:',msg);
 }
 
-function leaveGroup(){
-  if(!confirm('¿Salir del grupo? Seguirás en el ranking hasta que te quiten.'))return;
-  const s=getS();s.groupCode='';saveS(s);renderSocial();
+async function leaveGroup(){
+  if(!confirm('¿Salir del grupo? Se borrarán tus puntos de grupo.'))return;
+  const s=getS();
+  const oldCode=s.groupCode;
+  s.groupCode='';s.groupPoints=0;saveS(s);
+  // Eliminar fila del leaderboard
+  try{
+    const sc=getSupa();if(sc){
+      const{data:{user}}=await sc.auth.getUser();
+      if(user)await sc.from('leaderboard').delete().eq('user_id',user.id);
+    }
+  }catch(e){console.error('leaveGroup delete:',e);}
+  if(oldCode){localStorage.removeItem('grp_habits_'+oldCode);localStorage.removeItem('grp_cfg_'+oldCode);}
+  renderSocial();
   showToast('Has salido del grupo');
 }
 
@@ -3959,7 +3970,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=45;
+const APP_VERSION=46;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
