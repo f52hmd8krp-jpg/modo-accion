@@ -3330,7 +3330,8 @@ async function fetchPendingMembers(code,cfg){
     </div>`;
   const sc=getSupa();if(!sc)return;
   try{
-    const{data}=await sc.from('leaderboard').select('display_name,updated_at').eq('group_code',code).order('updated_at',{ascending:false});
+    const{data,error}=await sc.from('leaderboard').select('display_name,updated_at').eq('group_code',code).order('updated_at',{ascending:false});
+    if(error)console.error('fetchPendingMembers error:',error);
     const members=data||[];
     const listEl=document.getElementById('pendMemberList');
     if(listEl){
@@ -3481,7 +3482,9 @@ async function joinGroup(){
   const sc=getSupa();
   let grpName=code,grpDur=null,grpHabits=[],grpMins={};
   try{
-    const{data}=await sc.from('leaderboard').select('display_name,group_name,group_habits,group_duration,group_minimums').eq('group_code',code).order('updated_at',{ascending:false}).limit(10);
+    const{data,error:jErr}=await sc.from('leaderboard').select('display_name,group_name,group_habits,group_duration,group_minimums').eq('group_code',code).order('updated_at',{ascending:false}).limit(10);
+    if(jErr)console.error('joinGroup query error:',jErr);
+    console.log('joinGroup found:',data?.length,'members for code:',code);
     if(data&&data.length){
       const row=data[0];
       grpName=row.group_name||code;
@@ -3544,7 +3547,10 @@ async function fetchGroupData(groupCode){
       sc.from('leaderboard').select('*').eq('group_code',groupCode).order('points',{ascending:false}),
       sc.from('group_challenges').select('*').eq('group_code',groupCode).order('created_at',{ascending:false}).limit(3)
     ]);
+    if(lbRes.error)console.error('fetchGroupData lb error:',lbRes.error);
+    if(chalRes.error)console.error('fetchGroupData chal error:',chalRes.error);
     const data=lbRes.data||[];
+    console.log('fetchGroupData:',groupCode,'members:',data.length,data.map(d=>d.display_name));
     if(!data.length){
       if(strEl)strEl.innerHTML=`<div style="font-size:11px;color:var(--w3);padding:0 22px 12px;font-weight:300">Aún no hay miembros. Comparte el código.</div>`;
       return;
@@ -3794,13 +3800,14 @@ async function pushToLeaderboard(s){
     });
     // Hoy: usar s.done (tiene timestamps precisos)
     Object.entries(s.done).forEach(([id,d])=>habitsWeek.push({id,name:H.find(h=>h.id===id)?.name||id,date:todayDate,ts:d.ts||0}));
-    await sc.from('leaderboard').upsert({
+    const{error}=await sc.from('leaderboard').upsert({
       user_id:user.id,display_name:name,group_code:s.groupCode||null,
       points:s.points||0,streak:overallStreak(s),
       habits_today:habitsToday,active_dates:activeDates,habits_week:habitsWeek,
       updated_at:new Date().toISOString()
-    });
-  }catch(e){}
+    },{onConflict:'user_id'});
+    if(error)console.error('pushToLeaderboard error:',error);
+  }catch(e){console.error('pushToLeaderboard catch:',e);}
 }
 
 // ═══ HABIT MANAGEMENT ═══
@@ -3935,7 +3942,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=42;
+const APP_VERSION=43;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
