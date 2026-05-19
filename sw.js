@@ -1,4 +1,4 @@
-const CACHE = 'prax-v43';
+const CACHE = 'prax-v44';
 const ASSETS = [
   '/modo-accion/',
   '/modo-accion/index.html',

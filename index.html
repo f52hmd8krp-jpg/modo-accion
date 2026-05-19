@@ -1543,7 +1543,7 @@ const DS=['D','L','M','X','J','V','S'];
 
 function getS(){
   // Intentar cargar v5
-  try{const r=localStorage.getItem('ma_v5');if(r){const p=JSON.parse(r);if(!p.reflections)p.reflections={};if(!p.geopoints)p.geopoints={};if(!p.groupCode)p.groupCode='';if(!p.displayName)p.displayName='';if(!p.habits||!p.habits.length)p.habits=[...DEFAULT_HABITS];else p.habits=p.habits.map(h=>({icon:'gym',color:PALETTE[0],...h}));return p;}}catch(e){}
+  try{const r=localStorage.getItem('ma_v5');if(r){const p=JSON.parse(r);if(!p.reflections)p.reflections={};if(!p.geopoints)p.geopoints={};if(!p.groupCode)p.groupCode='';if(!p.displayName)p.displayName='';if(p.groupPoints===undefined)p.groupPoints=0;if(!p.habits||!p.habits.length)p.habits=[...DEFAULT_HABITS];else p.habits=p.habits.map(h=>({icon:'gym',color:PALETTE[0],...h}));return p;}}catch(e){}
   // Migrar desde versiones anteriores (v4, v3, v2) conservando el token
   for(const key of ['ma_v4','ma_v3','ma_v2','modo_accion_v2']){
     try{
@@ -1570,7 +1570,7 @@ function getS(){
   }
   return newS();
 }
-function newS(){return{points:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false],notifTimes:[9,19,22],reflections:{},ghToken:'',ghGist:'',geopoints:{},groupCode:'',displayName:'',habits:[...DEFAULT_HABITS],lastSaved:0};}
+function newS(){return{points:0,groupPoints:0,token:Math.random().toString(36).substr(2,8).toUpperCase(),today:'',done:{},history:{},streaks:{},wa:'',notif:false,notifDays:[false,true,true,true,true,true,false],notifTimes:[9,19,22],reflections:{},ghToken:'',ghGist:'',geopoints:{},groupCode:'',displayName:'',habits:[...DEFAULT_HABITS],lastSaved:0};}
 function saveS(s){s.lastSaved=Date.now();localStorage.setItem('ma_v5',JSON.stringify(s));pushToSupabase(s);pushToGist(s);}
 
 async function pushToGist(s){
@@ -2323,7 +2323,13 @@ function finishHabit(id,data={}){
   if(h.bCond==='streak5'&&str>=4)bonus=h.bPts;
   if(h.bCond==='streak7'&&str>=6)bonus=h.bPts;
   if(data.bonus)bonus=h.bPts;
-  pts+=bonus;const oldPts=s.points;s.points+=pts;s.done[id]={ts:Date.now(),min:data.min||0,txt:data.txt||'',pts};
+  pts+=bonus;const oldPts=s.points;s.points+=pts;
+  // Puntos de grupo (solo hábitos del grupo, o todos si no hay lista)
+  if(s.groupCode){
+    const gh=JSON.parse(localStorage.getItem('grp_habits_'+s.groupCode)||'[]');
+    if(!gh.length||gh.includes(id))s.groupPoints=(s.groupPoints||0)+pts;
+  }
+  s.done[id]={ts:Date.now(),min:data.min||0,txt:data.txt||'',pts};
   saveS(s);pushToLeaderboard(s);renderHome();
   setTimeout(()=>checkLevelUp(oldPts,s.points),600);
   document.getElementById('okPts').textContent='+'+pts;
@@ -3333,6 +3339,8 @@ async function fetchPendingMembers(code,cfg){
     const{data,error}=await sc.from('leaderboard').select('display_name,updated_at').eq('group_code',code).order('updated_at',{ascending:false});
     if(error)console.error('fetchPendingMembers error:',error);
     const members=data||[];
+    // Asegurar que grp_habits_ existe para el creador
+    if(!localStorage.getItem('grp_habits_'+code)&&cfg.habits)localStorage.setItem('grp_habits_'+code,JSON.stringify(cfg.habits));
     const listEl=document.getElementById('pendMemberList');
     if(listEl){
       listEl.innerHTML=members.length===0
@@ -3456,7 +3464,8 @@ async function finishGroupSetup(){
   const name=document.getElementById('compNameIn').value.trim()||'Competición';
   const cfg={code,name,habits:_wizHabits,duration:_wizDur,minimums:_wizMins,startedAt:null,createdAt:Date.now()};
   localStorage.setItem('grp_cfg_'+code,JSON.stringify(cfg));
-  const s=getS();s.groupCode=code;saveS(s);
+  localStorage.setItem('grp_habits_'+code,JSON.stringify(_wizHabits));
+  const s=getS();s.groupCode=code;s.groupPoints=0;saveS(s);
   await pushToLeaderboard(s);
   // Intentar sincronizar config a Supabase (falla silenciosamente si columnas no existen)
   try{
@@ -3474,7 +3483,7 @@ async function finishGroupSetup(){
 }
 
 // Al unirse: mostrar reglas primero
-let _pendingJoinCode='';
+let _pendingJoinCode='',_pendingJoinHabits=[];
 async function joinGroup(){
   const code=(document.getElementById('joinCodeIn')?.value||'').trim().toUpperCase();
   if(code.length<4){showToast('Código inválido');return;}
@@ -3511,12 +3520,14 @@ async function joinGroup(){
     ${minsRows}
     <div class="join-cond-row"><span>Duración</span><span class="join-cond-row-val">${durTxt}</span></div>
   </div>`;
+  _pendingJoinHabits=grpHabits;
   document.getElementById('grpRulesTitle').textContent=grpName;
   document.getElementById('mGroupRules').classList.add('open');
 }
 async function confirmJoinGroup(){
   const code=_pendingJoinCode;if(!code)return;
-  const s=getS();s.groupCode=code;saveS(s);
+  if(_pendingJoinHabits.length)localStorage.setItem('grp_habits_'+code,JSON.stringify(_pendingJoinHabits));
+  const s=getS();s.groupCode=code;s.groupPoints=0;saveS(s);
   await pushToLeaderboard(s);
   document.getElementById('mGroupRules').classList.remove('open');
   showToast('¡Bienvenido al grupo '+code+'!');renderSocial();
@@ -3551,6 +3562,11 @@ async function fetchGroupData(groupCode){
     if(chalRes.error)console.error('fetchGroupData chal error:',chalRes.error);
     const data=lbRes.data||[];
     console.log('fetchGroupData:',groupCode,'members:',data.length,data.map(d=>d.display_name));
+    // Guardar hábitos del grupo localmente si no existen
+    if(!localStorage.getItem('grp_habits_'+groupCode)){
+      const row=data.find(d=>d.group_habits&&d.group_habits.length);
+      if(row)localStorage.setItem('grp_habits_'+groupCode,JSON.stringify(row.group_habits));
+    }
     if(!data.length){
       if(strEl)strEl.innerHTML=`<div style="font-size:11px;color:var(--w3);padding:0 22px 12px;font-weight:300">Aún no hay miembros. Comparte el código.</div>`;
       return;
@@ -3802,7 +3818,8 @@ async function pushToLeaderboard(s){
     Object.entries(s.done).forEach(([id,d])=>habitsWeek.push({id,name:H.find(h=>h.id===id)?.name||id,date:todayDate,ts:d.ts||0}));
     const{error}=await sc.from('leaderboard').upsert({
       user_id:user.id,display_name:name,group_code:s.groupCode||null,
-      points:s.points||0,streak:overallStreak(s),
+      points:s.groupCode?(s.groupPoints||0):(s.points||0),
+      streak:overallStreak(s),
       habits_today:habitsToday,active_dates:activeDates,habits_week:habitsWeek,
       updated_at:new Date().toISOString()
     },{onConflict:'user_id'});
@@ -3942,7 +3959,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=43;
+const APP_VERSION=44;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
