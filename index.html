@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Modo Acción">
-<title>Modo Acción</title>
+<meta name="apple-mobile-web-app-title" content="PRAX">
+<title>PRAX</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
 <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-v2.png">
@@ -879,7 +879,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       <path d="M13 2L4.5 13.5H11.5L11 22L19.5 10.5H12.5L13 2Z" fill="rgba(255,255,255,.9)" stroke="rgba(255,255,255,.3)" stroke-width=".5" stroke-linejoin="round"/>
     </svg>
   </div>
-  <div class="auth-logo">MODO<em>ACCIÓN</em></div>
+  <div class="auth-logo">PRAX</div>
   <div style="font-size:12px;color:var(--w3);margin-bottom:36px;text-align:center;font-weight:300">Tu tracker de hábitos diario</div>
   <div class="auth-card">
     <input class="auth-input" type="email" id="authEmail" placeholder="tu@email.com" autocomplete="email">
@@ -907,7 +907,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
       </svg>
     </div>
   </div>
-  <div class="sp-name">MODO <em>ACCIÓN</em></div>
+  <div class="sp-name">PRAX</div>
 </div>
 <div id="app">
 
@@ -915,7 +915,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 <div id="s-home" class="screen active">
   <div class="hdr">
     <div class="hdr-top">
-      <div class="app-title">MODO<em>ACCIÓN</em></div>
+      <div class="app-title">PRAX</div>
       <div style="display:flex;align-items:flex-start;gap:10px">
         <div class="cdwn-box">
           <div class="cdwn-lbl">Cierre en</div>
@@ -1621,7 +1621,7 @@ async function connectGist(){
     } else {
       const cr=await fetch('https://api.github.com/gists',{method:'POST',
         headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
-        body:JSON.stringify({description:'Modo Acción backup',public:false,
+        body:JSON.stringify({description:'PRAX backup',public:false,
           files:{'modo-accion.json':{content:JSON.stringify(s)}}})});
       if(!cr.ok)throw new Error();
       const cData=await cr.json();s.ghGist=cData.id;saveS(s);
@@ -3011,7 +3011,7 @@ function renderPrax(s){
   });
   const gE=Math.round(energies.reduce((a,b)=>a+b,0)/energies.length);
   const gSt=gE>=75?'high':gE>=50?'medium':gE>=25?'low':'broken';
-  const msgs={high:'Modo Acción activado. Sigue.',medium:'Bien. No te detengas.',low:'Activa más hábitos hoy.',broken:'Sin acción no hay resultado.'};
+  const msgs={high:'PRAX activado. Sigue.',medium:'Bien. No te detengas.',low:'Activa más hábitos hoy.',broken:'Sin acción no hay resultado.'};
   const glowC=gSt==='high'?'oklch(0.72 0.19 35 / .2)':gSt==='medium'?'rgba(240,192,64,.12)':'transparent';
   let html=`<div class="prax-global-card prax-state-${gSt}" style="--prax-glow:${glowC}">
     <div class="prax-mascot-wrap">${praxImg(72,gSt,'default')}</div>
@@ -3141,7 +3141,7 @@ function printQR(h){
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>QR ${h.name}</title>
   <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#fff;gap:16px;padding:24px}h2{font-size:22px;font-weight:700;letter-spacing:2px;text-transform:uppercase}p{color:#666;font-size:13px;text-align:center;max-width:240px;line-height:1.5}small{color:#bbb;font-size:10px;font-family:monospace;letter-spacing:2px}button{padding:10px 28px;background:#000;color:#fff;border:none;border-radius:4px;font-size:13px;cursor:pointer;letter-spacing:.5px}@media print{button{display:none}}</style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-  </head><body><h2>${h.name}</h2><p>Escanea con Modo Acción</p><div id="q"></div><small>${s.token}</small><button onclick="window.print()">Imprimir</button>
+  </head><body><h2>${h.name}</h2><p>Escanea con PRAX</p><div id="q"></div><small>${s.token}</small><button onclick="window.print()">Imprimir</button>
   <script>new QRCode(document.getElementById('q'),{text:'${qd}',width:256,height:256,colorDark:'#000',colorLight:'#fff'});<\/script></body></html>`);
 }
 function saveWA(){
@@ -3169,17 +3169,17 @@ function schedNotif(){
   const day=new Date().getDay();if(!(s.notifDays||[])[day])return;
   const times=s.notifTimes||[9,19,22];
   const msgs=['Buenos días. '+H.length+' misiones.','Quedan pocas horas.','Último aviso.'];
-  times.forEach((h,i)=>{const now=new Date(),target=new Date(now);target.setHours(h,0,0,0);const delay=target-now;if(delay>0)setTimeout(()=>{const s2=getS(),done=Object.keys(s2.done).length;new Notification('Modo Acción',{body:msgs[i]+' ('+done+'/'+H.length+')',tag:'ma-'+h});},delay);});
+  times.forEach((h,i)=>{const now=new Date(),target=new Date(now);target.setHours(h,0,0,0);const delay=target-now;if(delay>0)setTimeout(()=>{const s2=getS(),done=Object.keys(s2.done).length;new Notification('PRAX',{body:msgs[i]+' ('+done+'/'+H.length+')',tag:'ma-'+h});},delay);});
   // Notificación reflexión a las 23:00
   const now=new Date(),refTarget=new Date(now);refTarget.setHours(23,0,0,0);
   const refDelay=refTarget-now;
   if(refDelay>0)setTimeout(()=>{
-    const s2=getS();if(!s2.reflections[td()])new Notification('Modo Acción',{body:'¿Cómo ha ido el día? Escribe tu reflexión.',tag:'ma-reflex'});
+    const s2=getS();if(!s2.reflections[td()])new Notification('PRAX',{body:'¿Cómo ha ido el día? Escribe tu reflexión.',tag:'ma-reflex'});
   },refDelay);
   // Notificación hábito dormir a las 23:00
   const sleepH=H.find(h=>h.name.toLowerCase().includes('dormir'));
   if(sleepH){const sleepTarget=new Date(now);sleepTarget.setHours(23,0,0,0);const sleepDelay=sleepTarget-now;
-    if(sleepDelay>0)setTimeout(()=>{const s2=getS();if(!s2.done[sleepH.id])new Notification('Modo Acción — Dormir',{body:'Tienes 15 minutos para escanear tu hábito de dormir.',tag:'ma-sleep',requireInteraction:true});},sleepDelay);
+    if(sleepDelay>0)setTimeout(()=>{const s2=getS();if(!s2.done[sleepH.id])new Notification('PRAX — Dormir',{body:'Tienes 15 minutos para escanear tu hábito de dormir.',tag:'ma-sleep',requireInteraction:true});},sleepDelay);
   }
 }
 
@@ -3228,7 +3228,7 @@ function shareWA(){
   const s=getS();const fecha=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'});
   const lines=H.map(h=>(s.done[h.id]?'✓':'—')+' '+h.name).join('\n');
   const done=Object.keys(s.done).length,str=overallStreak(s);
-  const msg=`Modo Acción — ${fecha}\n\n${lines}\n\n${done}/${H.length} · Racha ${str}d`;
+  const msg=`PRAX — ${fecha}\n\n${lines}\n\n${done}/${H.length} · Racha ${str}d`;
   const phone=(s.wa||'').replace(/\D/g,'');
   if(!phone){showToast('Añade tu número en Ajustes');setTimeout(()=>goTo('settings'),800);return;}
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
@@ -3521,8 +3521,8 @@ async function confirmJoinGroup(){
 
 function shareGroupCode(){
   const s=getS();
-  const msg='Únete a mi grupo en Modo Acción 🚀\nCódigo: '+s.groupCode+'\n'+location.origin+location.pathname;
-  if(navigator.share){navigator.share({title:'Modo Acción',text:msg}).catch(()=>{});}
+  const msg='Únete a mi grupo en PRAX 🚀\nCódigo: '+s.groupCode+'\n'+location.origin+location.pathname;
+  if(navigator.share){navigator.share({title:'PRAX',text:msg}).catch(()=>{});}
   else if(navigator.clipboard){navigator.clipboard.writeText(msg).then(()=>showToast('Código copiado'));}
   else prompt('Comparte este código:',msg);
 }
@@ -3767,7 +3767,7 @@ function subscribeGroupRealtime(groupCode){
         if(lastHabit){
           showToast('💪 '+name+' completó '+lastHabit);
           if(Notification.permission==='granted'){
-            new Notification('Modo Acción',{body:name+' acaba de validar '+lastHabit,tag:'social-'+Date.now()});
+            new Notification('PRAX',{body:name+' acaba de validar '+lastHabit,tag:'social-'+Date.now()});
           }
         }
         fetchGroupData(groupCode);
@@ -3905,7 +3905,7 @@ function exportData(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   const date=new Date().toISOString().slice(0,10);
-  a.href=url;a.download='modo-accion-'+date+'.json';
+  a.href=url;a.download='prax-'+date+'.json';
   a.click();URL.revokeObjectURL(url);
   showToast('✓ Datos exportados');
 }
@@ -3935,7 +3935,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=41;
+const APP_VERSION=42;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){

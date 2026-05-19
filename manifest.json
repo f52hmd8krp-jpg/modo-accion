@@ -1,6 +1,6 @@
 {
-  "name": "Modo Acción",
-  "short_name": "Modo Acción",
+  "name": "PRAX",
+  "short_name": "PRAX",
   "description": "Trackea tus hábitos diarios con QR físicos",
   "start_url": "/modo-accion/index.html",
   "scope": "/modo-accion/",
