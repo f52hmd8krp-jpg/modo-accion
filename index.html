@@ -3592,12 +3592,14 @@ function shareGroupCode(){
   else prompt('Comparte este código:',msg);
 }
 
-async function leaveGroup(){
-  if(!confirm('¿Salir del grupo? Se borrarán tus puntos de grupo.'))return;
+function leaveGroup(){
+  document.getElementById('mLeaveGroup').classList.add('open');
+}
+async function confirmLeaveGroup(){
+  document.getElementById('mLeaveGroup').classList.remove('open');
   const s=getS();
   const oldCode=s.groupCode;
   s.groupCode='';s.groupPoints=0;saveS(s);
-  // Eliminar fila del leaderboard
   try{
     const sc=getSupa();if(sc){
       const{data:{user}}=await sc.auth.getUser();
@@ -3616,10 +3618,12 @@ async function fetchGroupData(groupCode){
   if(strEl)strEl.innerHTML=`<div class="slbl" style="padding-bottom:12px">Cargando grupo…</div>`;
   const sc=getSupa();if(!sc){if(strEl)strEl.innerHTML='';return;}
   try{
-    const[lbRes,chalRes]=await Promise.all([
+    const[lbRes,chalRes,meRes]=await Promise.all([
       sc.from('leaderboard').select('*').eq('group_code',groupCode).order('points',{ascending:false}),
-      sc.from('group_challenges').select('*').eq('group_code',groupCode).order('created_at',{ascending:false}).limit(3)
+      sc.from('group_challenges').select('*').eq('group_code',groupCode).order('created_at',{ascending:false}).limit(3),
+      sc.auth.getUser()
     ]);
+    const myUserId=meRes?.data?.user?.id||'';
     if(lbRes.error)console.error('fetchGroupData lb error:',lbRes.error);
     if(chalRes.error)console.error('fetchGroupData chal error:',chalRes.error);
     const data=lbRes.data||[];
@@ -3724,7 +3728,6 @@ async function fetchGroupData(groupCode){
     const raceLbl=document.getElementById('socRaceLbl');
     if(raceEl&&raceLbl){
       raceLbl.style.display='block';raceEl.style.display='block';
-      const myS=getS();const myName=myS.displayName||(myS.token||'');
       const top3=data.slice(0,3);
       const rest=data.slice(3);
       function podCol(r,pos,colCls,infoDelay,blockDelay){
@@ -3733,7 +3736,7 @@ async function fetchGroupData(groupCode){
         const pts=r.points||0;
         const habitsToday=(r.habits_today||[]).length;
         const streak=r.streak||0;
-        const isMe=name===myName;
+        const isMe=myUserId&&r.user_id===myUserId;
         const star=pos===1?`<div class="pod-star">★</div>`:'';
         return`<div class="pod-col ${colCls}">
           <div class="pod-info" style="animation-delay:${infoDelay}">
@@ -3750,7 +3753,7 @@ async function fetchGroupData(groupCode){
       const restHTML=rest.length?`<div class="pod-rest">${rest.map((r,i)=>{
         const pos=i+4;const name=r.display_name||'—';const pts=r.points||0;
         const habitsToday=(r.habits_today||[]).length;const streak=r.streak||0;
-        const isMe=name===myName;
+        const isMe=myUserId&&r.user_id===myUserId;
         return`<div class="pod-rest-row" style="animation-delay:${.08*(i+1)}s">
           <span class="pod-rest-pos">${pos}</span>
           <span class="pod-rest-name">${name}${isMe?' · TÚ':''}</span>
@@ -3825,12 +3828,12 @@ async function submitChallenge(){
   const sc=getSupa();if(!sc)return;
   const{data:{user}}=await sc.auth.getUser();if(!user)return;
   const habitName=_chalHabitSel==='any'?'Cualquier hábito':(H.find(h=>h.id===_chalHabitSel)?.name||_chalHabitSel);
-  await sc.from('group_challenges').insert({
+  const{error:chalErr}=await sc.from('group_challenges').insert({
     group_code:s.groupCode,created_by:user.id,
     title:habitName+' · '+_chalDaysSel+'x semana',
-    habit_id:_chalHabitSel,target_count:_chalDaysSel,
-    week_start:td()
+    habit_id:_chalHabitSel,target_count:_chalDaysSel
   });
+  if(chalErr){console.error('submitChallenge:',chalErr);showToast('Error al crear el reto');return;}
   document.getElementById('mChallenge').classList.remove('open');
   showToast('🏆 Reto creado');
   fetchGroupData(s.groupCode);
@@ -4021,7 +4024,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=47;
+const APP_VERSION=48;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
@@ -4209,5 +4212,18 @@ document.addEventListener('touchend',e=>{const now=Date.now();if(now-_lt<300)e.p
 
 startApp();
 </script>
+
+<!-- Modal confirmación salir del grupo -->
+<div class="mbd" id="mLeaveGroup" style="z-index:300">
+  <div class="mbd-sheet" style="padding:28px 22px 24px">
+    <div style="font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.02em;margin-bottom:8px">Salir del grupo</div>
+    <div style="font-size:13px;color:var(--w3);font-weight:300;line-height:1.6;margin-bottom:24px">
+      Se borrarán tus puntos de grupo y dejarás de aparecer en el podio.
+    </div>
+    <button class="btn btn-w" style="margin:0 0 10px;background:#e05c5c;border-color:#e05c5c;color:#fff" onclick="confirmLeaveGroup()">Sí, salir</button>
+    <button class="btn btn-g" style="margin:0" onclick="document.getElementById('mLeaveGroup').classList.remove('open')">Cancelar</button>
+  </div>
+</div>
+
 </body>
 </html>
