@@ -3315,6 +3315,7 @@ let _realtimeChannel=null;
 let _chalHabitSel='any', _chalDaysSel=5;
 
 async function renderSocial(){
+  if(location.search.includes('rxdemo')){return rxDemo();}
   const s=getS();
   const sc=getSupa();let email='';
   if(sc){const{data:{user}}=await sc.auth.getUser();email=user?.email||'';}
@@ -3883,6 +3884,35 @@ function reactionBar(uid,ts,reactions,myUserId){
     return `<button class="rx-btn${mine?' on':''}" onclick="toggleReaction('${uid}',${ts},'${t}',${mine})">${reactionSvg(t)}${n?`<span>${n}</span>`:''}</button>`;
   }).join('');
 }
+// — Demo de reacciones (solo con ?rxdemo en la URL) —
+let _rxDemoData=[
+  {target_user:'u1',target_ts:1,reaction:'fuego',from_user:'x'},
+  {target_user:'u1',target_ts:1,reaction:'fuego',from_user:'z'},
+  {target_user:'u2',target_ts:2,reaction:'bestia',from_user:'a'}
+];
+function rxDemo(){
+  const as=document.getElementById('authScreen');if(as)as.style.display='none';
+  const app=document.getElementById('app');if(app)app.style.display='block';
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  const ss=document.getElementById('s-social');if(ss)ss.classList.add('active');
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById('n-social');if(nb)nb.classList.add('active');
+  const meEl=document.getElementById('socMe');if(meEl)meEl.innerHTML='';
+  const grp=document.getElementById('socGroup');if(grp)grp.innerHTML='<div class="slbl" style="margin-bottom:10px">Demo de reacciones · toca los iconos</div>';
+  const lbl=document.getElementById('socFeedLbl');if(lbl)lbl.style.display='block';
+  rxDemoRender();
+}
+function rxDemoRender(){
+  const feedEl=document.getElementById('socFeed');if(!feedEl)return;
+  const mk=(name,habit,ago,uid,ts)=>`<div class="feed-item"><div class="feed-dot"></div><div class="feed-main"><div class="feed-txt"><b>${name}</b> completó <b>${habit}</b></div><div class="feed-rx">${RX_TYPES.map(t=>{const list=_rxDemoData.filter(x=>x.target_user===uid&&x.target_ts===ts&&x.reaction===t);const mine=list.some(x=>x.from_user==='me');return `<button class="rx-btn${mine?' on':''}" onclick="rxDemoToggle('${uid}',${ts},'${t}')">${reactionSvg(t)}${list.length?`<span>${list.length}</span>`:''}</button>`;}).join('')}</div></div><div class="feed-time">${ago}</div></div>`;
+  feedEl.innerHTML=mk('Pablo','Gimnasio','2h','u1',1)+mk('Marta','Lectura','4h','u2',2)+mk('Leo','Meditación','6h','u3',3);
+}
+function rxDemoToggle(uid,ts,type){
+  const i=_rxDemoData.findIndex(x=>x.target_user===uid&&x.target_ts===ts&&x.reaction===type&&x.from_user==='me');
+  if(i>=0)_rxDemoData.splice(i,1);
+  else _rxDemoData.push({target_user:uid,target_ts:ts,reaction:type,from_user:'me'});
+  rxDemoRender();
+}
 async function toggleReaction(uid,ts,type,mine){
   const sc=getSupa();if(!sc)return;
   try{
@@ -4157,7 +4187,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=51;
+const APP_VERSION=52;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
@@ -4266,6 +4296,10 @@ async function signOut(){
 }
 
 async function startApp(){
+  if(location.search.includes('rxdemo')){
+    const sp=document.getElementById('splash');if(sp)sp.remove();
+    rxDemo();return;
+  }
   const sc=getSupa();
   if(!sc){init();return;}
 
