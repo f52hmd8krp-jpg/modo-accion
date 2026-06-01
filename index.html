@@ -543,6 +543,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .streak-band-fire{font-size:24px;line-height:1;flex-shrink:0}
 .streak-band-lbl{font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase}
 .streak-band-sub{font-size:11px;color:var(--w2);margin-top:2px;font-weight:300;line-height:1.4}
+/* Competition banner */
+.comp-banner{margin:0 22px 14px;border-radius:14px;padding:18px 16px;text-align:center}
+.comp-active{background:var(--s1);border:1px solid var(--b1)}
+.comp-active-lbl{font-size:9px;color:var(--w3);font-family:'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.comp-countdown{font-family:'Anton',sans-serif;font-size:28px;color:var(--w);letter-spacing:.01em;line-height:1}
+.comp-ended{background:linear-gradient(160deg,color-mix(in oklab,var(--lvl-accent) 14%,var(--s1)),var(--s1));border:1px solid color-mix(in oklab,var(--lvl-accent) 35%,transparent)}
+.comp-trophy{margin-bottom:8px;filter:drop-shadow(0 0 14px color-mix(in oklab,var(--lvl-accent) 50%,transparent))}
+.comp-ended-lbl{font-size:9px;color:var(--lvl-accent);font-family:'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.comp-winner-name{font-family:'Anton',sans-serif;font-size:30px;color:var(--w);letter-spacing:.01em;line-height:1.05}
+.comp-winner-pts{font-size:11px;color:var(--w2);font-family:'JetBrains Mono',monospace;margin-top:5px;letter-spacing:.3px}
 /* Challenges */
 .challenge-card{border:1px solid var(--b1);border-radius:12px;padding:14px 16px;margin-bottom:8px;background:var(--s1)}
 .challenge-ttl{font-size:13px;color:var(--w);font-weight:400;margin-bottom:2px}
@@ -3417,12 +3427,20 @@ async function fetchPendingMembers(code,cfg){
   }catch(e){}
 }
 
-function startGroup(){
+async function startGroup(){
   const s=getS();
   const cfg=JSON.parse(localStorage.getItem('grp_cfg_'+s.groupCode)||'null');
   if(!cfg)return;
+  const startedAt=new Date().toISOString();
   cfg.startedAt=Date.now();
   localStorage.setItem('grp_cfg_'+s.groupCode,JSON.stringify(cfg));
+  // Sincronizar a Supabase para que todos los miembros vean el inicio
+  try{
+    const sc=getSupa();if(sc){
+      const{data:{user}}=await sc.auth.getUser();
+      if(user)await sc.from('leaderboard').update({group_started_at:startedAt}).eq('user_id',user.id);
+    }
+  }catch(e){console.error('startGroup sync:',e);}
   showToast('🏁 ¡Competición iniciada!');
   renderSocial();
 }
@@ -3647,11 +3665,37 @@ async function fetchGroupData(groupCode){
       return;
     }
 
+    // — Estado de la competición (cuenta atrás / ganador) —
+    const compRow=data.find(d=>d.group_started_at)||data.find(d=>d.group_duration!=null);
+    const comp=compStatus(compRow);
+    let compBannerHtml='';
+    if(comp.state==='ended'){
+      const winner=data[0]; // ordenados por puntos desc
+      compBannerHtml=`<div class="comp-banner comp-ended">
+        <div class="comp-trophy"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--lvl-accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v3a6 6 0 01-12 0V4z"/><path d="M6 6H3v1a3 3 0 003 3M18 6h3v1a3 3 0 01-3 3"/><path d="M9 16h6M10 20h4M12 16v4"/></svg></div>
+        <div class="comp-ended-lbl">Competición finalizada</div>
+        <div class="comp-winner-name">${winner?.display_name||'—'}</div>
+        <div class="comp-winner-pts">${winner?.points||0} pts · Campeón</div>
+      </div>`;
+    } else if(comp.state==='active'&&comp.endsAt){
+      const rem=comp.endsAt-Date.now();
+      const d=Math.floor(rem/86400000),h=Math.floor((rem%86400000)/3600000);
+      compBannerHtml=`<div class="comp-banner comp-active">
+        <div class="comp-active-lbl">Competición en curso</div>
+        <div class="comp-countdown">${d>0?d+'d ':''}${h}h restantes</div>
+      </div>`;
+    } else if(comp.state==='active'){
+      compBannerHtml=`<div class="comp-banner comp-active">
+        <div class="comp-active-lbl">Competición en curso</div>
+        <div class="comp-countdown">Sin límite de tiempo</div>
+      </div>`;
+    }
+
     // — Racha de grupo —
     const groupStreak=calcGroupStreak(data);
     if(strEl){
       const broken=groupStreak===0;
-      strEl.innerHTML=`<div class="slbl">Racha del grupo</div>
+      strEl.innerHTML=compBannerHtml+`<div class="slbl">Racha del grupo</div>
         <div class="streak-band" style="margin-bottom:0">
           <div class="streak-band-fire">${broken
             ?`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(224,92,92,.7)" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>`
@@ -3796,6 +3840,16 @@ async function fetchGroupData(groupCode){
       </div>`).join('');
     }
   }catch(e){console.error('fetchGroupData',e);}
+}
+
+function compStatus(configRow){
+  const startedAt=configRow?.group_started_at?new Date(configRow.group_started_at).getTime():null;
+  const dur=configRow?.group_duration;
+  if(!startedAt)return{state:'pending'};
+  if(!dur||dur===0)return{state:'active',startedAt,endsAt:null};
+  const endsAt=startedAt+dur*86400000;
+  if(Date.now()>=endsAt)return{state:'ended',startedAt,endsAt};
+  return{state:'active',startedAt,endsAt};
 }
 
 function calcGroupStreak(members){
@@ -4050,7 +4104,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=49;
+const APP_VERSION=50;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
