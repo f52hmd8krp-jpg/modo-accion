@@ -3331,14 +3331,19 @@ async function renderSocial(){
   const grp=document.getElementById('socGroup');
   if(!grp)return;
   if(!s.groupCode){
+    const noName=!s.displayName;
     grp.innerHTML=`<div class="soc-join-box">
+      ${noName?`<div style="background:color-mix(in oklab,var(--lvl-accent) 12%,var(--s1));border:1px solid color-mix(in oklab,var(--lvl-accent) 40%,transparent);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--w2);line-height:1.6;font-weight:300">
+        ⚠️ Pon tu nombre antes de unirte al grupo — así te reconocerán en el podio.
+        <button onclick="toggleNameEdit()" style="display:block;margin-top:8px;background:none;border:none;color:var(--lvl-accent);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;padding:0;letter-spacing:.3px">→ Configurar nombre</button>
+      </div>`:''}
       <div class="soc-join-lbl">Compite con tus amigos.<br>Crea un grupo o únete con un código.</div>
       <div class="soc-join-btns">
         <button class="btn btn-w" style="margin:0;font-size:12px" onclick="createGroup()">Crear grupo</button>
         <button class="btn btn-g" style="margin:0;font-size:12px" onclick="showJoinBox()">Unirse</button>
       </div>
       <div id="joinBox" style="display:none;margin-top:12px">
-        <input class="soc-join-input" id="joinCodeIn" placeholder="Código del grupo" maxlength="6">
+        <input class="soc-join-input" id="joinCodeIn" placeholder="Código del grupo" maxlength="6" style="text-transform:uppercase">
         <button class="btn btn-w" style="font-size:12px" onclick="joinGroup()">Entrar al grupo</button>
       </div>
     </div>`;
@@ -3352,11 +3357,15 @@ async function renderSocial(){
         <div class="soc-code-lbl">${grpLabel}</div>
         <div class="soc-code-val">${s.groupCode}</div>
       </div>
-      <button onclick="shareGroupCode()" style="padding:9px 14px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--w2);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer">Compartir</button>
+      <div style="display:flex;gap:8px">
+        <button onclick="fetchGroupData('${s.groupCode}')" title="Actualizar" style="padding:9px 12px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--w3);font-size:16px;cursor:pointer;line-height:1">↻</button>
+        <button onclick="shareGroupCode()" style="padding:9px 14px;background:transparent;border:1px solid var(--b2);border-radius:8px;color:var(--w2);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer">Compartir</button>
+      </div>
     </div>
     <button onclick="leaveGroup()" style="width:100%;padding:10px;background:transparent;border:none;color:var(--w3);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;margin-bottom:4px">Salir del grupo</button>`;
     if(isPending){
       fetchPendingMembers(s.groupCode,cfg);
+      subscribeGroupRealtime(s.groupCode); // para ver nuevos miembros en tiempo real
     } else {
       fetchGroupData(s.groupCode);
       subscribeGroupRealtime(s.groupCode);
@@ -3659,8 +3668,10 @@ async function fetchGroupData(groupCode){
     // — Mínimos semanales —
     const s=getS();
     const cfg=s.groupCode?JSON.parse(localStorage.getItem('grp_cfg_'+s.groupCode)||'null'):null;
-    const minimums=cfg?.minimums||{};
-    const habitIds=cfg?.habits||H.map(h=>h.id);
+    // Fallback: leer mínimos desde la fila del creador en Supabase (no-creadores no tienen cfg local)
+    const dbRow=data.find(d=>d.group_minimums&&Object.keys(d.group_minimums).length>0);
+    const minimums=cfg?.minimums||dbRow?.group_minimums||{};
+    const habitIds=cfg?.habits||dbRow?.group_habits||H.map(h=>h.id);
     const minsEl=document.getElementById('socMins');
     const minsLbl=document.getElementById('socMinsLbl');
     if(minsEl&&minsLbl&&Object.keys(minimums).length>0){
@@ -3699,7 +3710,8 @@ async function fetchGroupData(groupCode){
     const chalEl=document.getElementById('socChallenge');
     if(chalEl&&chalLbl){
       chalLbl.style.display='block';
-      let chalHtml=challenges.map(c=>{
+      const emptyChal=!challenges.length?`<div style="font-size:11px;color:var(--w3);font-weight:300;line-height:1.6;padding:0 22px 12px">Reta al grupo a completar un hábito X veces esta semana. El progreso se actualiza en tiempo real.</div>`:'';
+      let chalHtml=emptyChal+challenges.map(c=>{
         const target=c.target_count||5;
         const rows=data.map(m=>{
           const week=m.habits_week||[];
@@ -3734,7 +3746,8 @@ async function fetchGroupData(groupCode){
         if(!r)return`<div class="pod-col ${colCls}"><div class="pod-block" style="animation-delay:${blockDelay}"><span class="pod-num">${pos}</span></div></div>`;
         const name=r.display_name||'—';
         const pts=r.points||0;
-        const habitsToday=(r.habits_today||[]).length;
+        const todayStr=td();
+        const habitsToday=(r.habits_today||[]).filter(h=>h.ts&&new Date(h.ts).toISOString().slice(0,10)===todayStr).length;
         const streak=r.streak||0;
         const isMe=myUserId&&r.user_id===myUserId;
         const star=pos===1?`<div class="pod-star">★</div>`:'';
@@ -3752,7 +3765,7 @@ async function fetchGroupData(groupCode){
       }
       const restHTML=rest.length?`<div class="pod-rest">${rest.map((r,i)=>{
         const pos=i+4;const name=r.display_name||'—';const pts=r.points||0;
-        const habitsToday=(r.habits_today||[]).length;const streak=r.streak||0;
+        const habitsToday=(r.habits_today||[]).filter(h=>h.ts&&new Date(h.ts).toISOString().slice(0,10)===td()).length;const streak=r.streak||0;
         const isMe=myUserId&&r.user_id===myUserId;
         return`<div class="pod-rest-row" style="animation-delay:${.08*(i+1)}s">
           <span class="pod-rest-pos">${pos}</span>
@@ -3845,19 +3858,32 @@ function subscribeGroupRealtime(groupCode){
   _realtimeChannel=sc.channel('group-'+groupCode)
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'leaderboard',filter:'group_code=eq.'+groupCode},
       async payload=>{
-        const me=getS();const scl=getSupa();
-        let myId='';
+        const scl=getSupa();let myId='';
         if(scl){const{data:{user}}=await scl.auth.getUser();myId=user?.id||'';}
-        if(payload.new?.user_id===myId)return; // ignorar mis propios cambios
+        if(payload.new?.user_id===myId)return;
         const name=payload.new?.display_name||'Alguien';
         const lastHabit=(payload.new?.habits_today||[]).at(-1)?.name||'';
         if(lastHabit){
           showToast('💪 '+name+' completó '+lastHabit);
-          if(Notification.permission==='granted'){
+          if(Notification.permission==='granted')
             new Notification('PRAX',{body:name+' acaba de validar '+lastHabit,tag:'social-'+Date.now()});
-          }
         }
         fetchGroupData(groupCode);
+      })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'leaderboard',filter:'group_code=eq.'+groupCode},
+      payload=>{
+        const name=payload.new?.display_name||'Alguien';
+        showToast('👋 '+name+' se unió al grupo');
+        // Refrescar vista pendiente si el creador está esperando
+        const s=getS();
+        const cfg=JSON.parse(localStorage.getItem('grp_cfg_'+groupCode)||'null');
+        if(cfg&&!cfg.startedAt)fetchPendingMembers(groupCode,cfg);
+        else fetchGroupData(groupCode);
+      })
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'leaderboard'},
+      payload=>{
+        // Alguien salió del grupo — refrescar podio
+        if(payload.old?.group_code===groupCode)fetchGroupData(groupCode);
       })
     .subscribe();
 }
@@ -3872,7 +3898,7 @@ async function pushToLeaderboard(s){
     const activeDates=Object.entries(s.history).filter(([,v])=>v.length>0).map(([d])=>d).sort().slice(-30);
     if(Object.keys(s.done).length>0&&!activeDates.includes(td()))activeDates.push(td());
     // Hábitos de esta semana para retos
-    const weekStart=new Date();weekStart.setDate(weekStart.getDate()-weekStart.getDay());
+    const weekStart=new Date();const _dow=weekStart.getDay();weekStart.setDate(weekStart.getDate()-(_dow===0?6:_dow-1));
     const weekStartStr=weekStart.toISOString().slice(0,10);
     const habitsWeek=[];
     const todayDate=td();
@@ -4024,7 +4050,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=48;
+const APP_VERSION=49;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
