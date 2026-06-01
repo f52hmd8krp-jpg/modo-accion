@@ -537,6 +537,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .lb-bar{height:2px;background:var(--w3);border-radius:1px}
 .feed-item{padding:11px 0;border-bottom:1px solid var(--b1);display:flex;align-items:flex-start;gap:10px}
 .feed-item:last-child{border-bottom:none}
+.feed-main{flex:1;min-width:0}
+.feed-rx{display:flex;gap:6px;margin-top:7px}
+.rx-btn{display:inline-flex;align-items:center;gap:3px;padding:4px 7px;border-radius:9px;background:var(--s1);border:1px solid var(--b1);color:var(--w3);cursor:pointer;transition:all .12s;line-height:1}
+.rx-btn:active{transform:scale(.9)}
+.rx-btn.on{color:var(--lvl-accent);border-color:var(--lvl-accent);background:color-mix(in oklch,var(--lvl-accent) 12%,transparent)}
+.rx-btn span{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500}
 /* Group streak */
 .streak-band{margin:0 22px 8px;background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px}
 .streak-band-num{font-family:'Anton',sans-serif;font-size:42px;color:var(--w);line-height:1;flex-shrink:0}
@@ -3645,12 +3651,15 @@ async function fetchGroupData(groupCode){
   if(strEl)strEl.innerHTML=`<div class="slbl" style="padding-bottom:12px">Cargando grupo…</div>`;
   const sc=getSupa();if(!sc){if(strEl)strEl.innerHTML='';return;}
   try{
-    const[lbRes,chalRes,meRes]=await Promise.all([
+    const[lbRes,chalRes,meRes,rxRes]=await Promise.all([
       sc.from('leaderboard').select('*').eq('group_code',groupCode).order('points',{ascending:false}),
       sc.from('group_challenges').select('*').eq('group_code',groupCode).order('created_at',{ascending:false}).limit(3),
-      sc.auth.getUser()
+      sc.auth.getUser(),
+      sc.from('feed_reactions').select('*').eq('group_code',groupCode)
     ]);
     const myUserId=meRes?.data?.user?.id||'';
+    const reactions=rxRes?.data||[];
+    window._myUserId=myUserId;window._curGroup=groupCode;
     if(lbRes.error)console.error('fetchGroupData lb error:',lbRes.error);
     if(chalRes.error)console.error('fetchGroupData chal error:',chalRes.error);
     const data=lbRes.data||[];
@@ -3829,13 +3838,16 @@ async function fetchGroupData(groupCode){
     }
 
     // — Feed —
-    const feed=data.flatMap(r=>(r.habits_today||[]).map(h=>({name:r.display_name||'Usuario',habit:h.name,ts:h.ts||0})))
+    const feed=data.flatMap(r=>(r.habits_today||[]).map(h=>({name:r.display_name||'Usuario',habit:h.name,ts:h.ts||0,uid:r.user_id})))
       .filter(f=>f.ts>Date.now()-86400000).sort((a,b)=>b.ts-a.ts).slice(0,10);
     if(feed.length&&feedEl&&feedLbl){
       feedLbl.style.display='block';
       feedEl.innerHTML=feed.map(f=>`<div class="feed-item">
         <div class="feed-dot"></div>
-        <div class="feed-txt"><b>${f.name}</b> completó <b>${f.habit}</b></div>
+        <div class="feed-main">
+          <div class="feed-txt"><b>${f.name}</b> completó <b>${f.habit}</b></div>
+          <div class="feed-rx">${reactionBar(f.uid,f.ts,reactions,myUserId)}</div>
+        </div>
         <div class="feed-time">${_timeAgo(f.ts)}</div>
       </div>`).join('');
     }
@@ -3850,6 +3862,39 @@ function compStatus(configRow){
   const endsAt=startedAt+dur*86400000;
   if(Date.now()>=endsAt)return{state:'ended',startedAt,endsAt};
   return{state:'active',startedAt,endsAt};
+}
+
+// — Reacciones con diseños propios (line-art PRAX) —
+const RX_TYPES=['fuego','bestia','respeto','diana'];
+function reactionSvg(type){
+  const p={
+    fuego:'<path d="M12 3c.5 2.5 3.5 3.8 3.5 7.5a3.5 3.5 0 01-7 0c0-1.6.9-2.6.9-2.6.4 1.3 1.3 1.7 1.3 1.7.4-1.8-.6-4.4 1.3-6.6z"/>',
+    bestia:'<path d="M7 4l2.5 15M12 3l1.8 16M17 5l1.7 13"/>',
+    respeto:'<path d="M6 13l6-6 6 6M6 18l6-6 6 6"/>',
+    diana:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>'
+  };
+  return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p[type]||''}</svg>`;
+}
+function reactionBar(uid,ts,reactions,myUserId){
+  return RX_TYPES.map(t=>{
+    const list=reactions.filter(x=>x.target_user===uid&&Number(x.target_ts)===Number(ts)&&x.reaction===t);
+    const mine=list.some(x=>x.from_user===myUserId);
+    const n=list.length;
+    return `<button class="rx-btn${mine?' on':''}" onclick="toggleReaction('${uid}',${ts},'${t}',${mine})">${reactionSvg(t)}${n?`<span>${n}</span>`:''}</button>`;
+  }).join('');
+}
+async function toggleReaction(uid,ts,type,mine){
+  const sc=getSupa();if(!sc)return;
+  try{
+    const{data:{user}}=await sc.auth.getUser();if(!user)return;
+    const s=getS();const fromName=s.displayName||(user.email||'').split('@')[0]||'Usuario';
+    if(mine){
+      await sc.from('feed_reactions').delete().eq('target_user',uid).eq('target_ts',ts).eq('from_user',user.id).eq('reaction',type);
+    }else{
+      await sc.from('feed_reactions').insert({group_code:window._curGroup,target_user:uid,target_ts:ts,from_user:user.id,from_name:fromName,reaction:type});
+    }
+    fetchGroupData(window._curGroup);
+  }catch(e){console.error('toggleReaction',e);}
 }
 
 function calcGroupStreak(members){
@@ -3938,6 +3983,14 @@ function subscribeGroupRealtime(groupCode){
       payload=>{
         // Alguien salió del grupo — refrescar podio
         if(payload.old?.group_code===groupCode)fetchGroupData(groupCode);
+      })
+    .on('postgres_changes',{event:'*',schema:'public',table:'feed_reactions',filter:'group_code=eq.'+groupCode},
+      payload=>{
+        // Nueva reacción de otro miembro
+        if(payload.eventType==='INSERT'&&payload.new?.from_user!==window._myUserId){
+          showToast((payload.new.from_name||'Alguien')+' reaccionó a tu hábito');
+        }
+        fetchGroupData(groupCode);
       })
     .subscribe();
 }
@@ -4104,7 +4157,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=50;
+const APP_VERSION=51;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
