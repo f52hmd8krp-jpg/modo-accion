@@ -4187,7 +4187,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=52;
+const APP_VERSION=53;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
@@ -4295,42 +4295,51 @@ async function signOut(){
   location.reload();
 }
 
+function _killSplash(){
+  const sp=document.getElementById('splash');
+  if(sp){sp.classList.add('hide');setTimeout(()=>{const x=document.getElementById('splash');if(x)x.remove();},520);}
+}
 async function startApp(){
-  if(location.search.includes('rxdemo')){
-    const sp=document.getElementById('splash');if(sp)sp.remove();
-    rxDemo();return;
-  }
-  const sc=getSupa();
-  if(!sc){init();return;}
+  // Red de seguridad: si algo se cuelga, no dejar el splash atascado
+  const failSafe=setTimeout(()=>{
+    _killSplash();
+    const auth=document.getElementById('authScreen');
+    if(auth&&getComputedStyle(auth).display==='none'){try{init();}catch(e){auth.style.display='flex';}}
+  },6000);
+  try{
+    if(location.search.includes('rxdemo')){
+      _killSplash();rxDemo();clearTimeout(failSafe);return;
+    }
+    const sc=getSupa();
+    if(!sc){init();clearTimeout(failSafe);return;}
 
-  // Detectar recovery desde el hash de la URL (Supabase lo manda así)
-  const hash=location.hash;
-  if(hash.includes('type=recovery')||hash.includes('access_token')){
-    // Supabase procesa el token del hash automáticamente
-    const{data:{session},error}=await sc.auth.getSession();
+    // Detectar recovery desde el hash de la URL (Supabase lo manda así)
+    const hash=location.hash;
+    if(hash.includes('type=recovery')||hash.includes('access_token')){
+      const{data:{session}}=await sc.auth.getSession();
+      if(session){showResetPasswordScreen();clearTimeout(failSafe);return;}
+    }
+
+    sc.auth.onAuthStateChange((event)=>{
+      if(event==='PASSWORD_RECOVERY')showResetPasswordScreen();
+    });
+
+    const{data:{session}}=await sc.auth.getSession();
     if(session){
-      showResetPasswordScreen();
-      return;
+      try{await syncFromSupabase();}catch(e){console.error('sync',e);}
+      init();
+    } else {
+      setTimeout(()=>{
+        _killSplash();
+        document.getElementById('authScreen').style.display='flex';
+      },1100);
     }
-  }
-
-  // Escuchar evento PASSWORD_RECOVERY
-  sc.auth.onAuthStateChange((event,session)=>{
-    if(event==='PASSWORD_RECOVERY'){
-      showResetPasswordScreen();
-    }
-  });
-
-  const{data:{session}}=await sc.auth.getSession();
-  if(session){
-    await syncFromSupabase();
-    init();
-  } else {
-    setTimeout(()=>{
-      const sp=document.getElementById('splash');
-      if(sp){sp.classList.add('hide');setTimeout(()=>sp.remove(),520);}
-      document.getElementById('authScreen').style.display='flex';
-    },1100);
+  }catch(e){
+    console.error('startApp',e);
+    _killSplash();
+    const auth=document.getElementById('authScreen');if(auth)auth.style.display='flex';
+  }finally{
+    clearTimeout(failSafe);
   }
 }
 
