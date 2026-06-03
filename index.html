@@ -3202,12 +3202,9 @@ function printQR(h){
   </head><body><h2>${h.name}</h2><p>Escanea con PRAX</p><div id="q"></div><small>${s.token}</small><button onclick="window.print()">Imprimir</button>
   <script>new QRCode(document.getElementById('q'),{text:'${qd}',width:256,height:256,colorDark:'#000',colorLight:'#fff'});<\/script></body></html>`);
 }
-function saveWA(){
-  const s=getS();
 function getBedtimeCut(){
   const stored=localStorage.getItem('ma_bedtime_cut')||'00:00';
   const [hh,mm]=(stored||'00:00').split(':').map(Number);
-  // 00:00 = medianoche = fin del día = 23:59
   if(hh===0&&(mm||0)===0)return 23*60+59;
   return hh*60+(mm||0);
 }
@@ -3215,7 +3212,8 @@ function saveBedtimeCut(){
   const v=document.getElementById('bedtimeCutIn')?.value;
   if(v)localStorage.setItem('ma_bedtime_cut',v);
 }
-
+function saveWA(){
+  const s=getS();
   const raw=document.getElementById('waIn').value.trim();
   const digits=raw.replace(/\D/g,'');
   if(raw && digits.length<9){showToast('Número inválido — mínimo 9 dígitos');document.getElementById('waIn').value=s.wa||'';return;}
@@ -4187,7 +4185,7 @@ function doReset(){
   localStorage.removeItem('ma_v5');location.reload();
 }
 
-const APP_VERSION=54;
+const APP_VERSION=55;
 (function versionCheck(){
   const lastV=parseInt(localStorage.getItem('ma_app_v')||'0');
   if(lastV&&lastV<APP_VERSION){
